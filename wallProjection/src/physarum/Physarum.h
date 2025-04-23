@@ -7,9 +7,10 @@
 #include "points_management.h"
 #include "TextureCreation.h"
 
-#define SIMULATION_WIDTH 1280*3
-#define SIMULATION_HEIGHT 736
-#define NUMBER_OF_PARTICLES (512*512*22*3)
+#define SIMULATION_SCALE 0.66
+//#define SIMULATION_WIDTH 1280*3
+//#define SIMULATION_HEIGHT 736
+//#define NUMBER_OF_PARTICLES (512*512*22*3)
 #define PARTICLE_PARAMETERS_COUNT 6
 #define DECAY_FACTOR 0.75
 #define DEPOSIT_FACTOR 0.003
@@ -80,8 +81,8 @@ public:
     float curTranslationAxis2 = 0;
     float curMoveBiasActionX = 0;
     float curMoveBiasActionY = 0;
-    float curActionX = SIMULATION_WIDTH/2;
-    float curActionY = SIMULATION_HEIGHT/2;
+    //float curActionX = SIMULATION_WIDTH/2;
+    //float curActionY = SIMULATION_HEIGHT/2;
     float translationStep = 6.5;
     int currentWaveIndex = 0;
     float curL2 = 0;
@@ -127,6 +128,9 @@ public:
     ofTrueTypeFont myFont, myFontBold;
 
     map<int,tuple<long, ofTouchEventArgs> > touches;
+
+    int simulationWidth;
+    int simulationHeight;
 
 
     // int numFrames = 4000;

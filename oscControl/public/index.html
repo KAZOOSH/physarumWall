@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Physarum OSC Controller</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- Inline JavaScript to avoid MIME type issues -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const buttons = document.querySelectorAll('.osc-button');
+      const statusElement = document.getElementById('status');
+
+      buttons.forEach(button => {
+        button.addEventListener('click', async () => {
+          const address = button.getAttribute('data-address');
+          
+          try {
+            // Visual feedback while sending
+            button.style.opacity = '0.7';
+            statusElement.textContent = `Sending: ${address}...`;
+            statusElement.className = 'status';
+            
+            // Send OSC message via our API endpoint
+            const response = await fetch('/send-osc', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ address }),
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+              statusElement.textContent = `Sent: ${address}`;
+              statusElement.className = 'status success';
+            } else {
+              throw new Error(data.error || 'Failed to send OSC message');
+            }
+          } catch (error) {
+            console.error('Error sending OSC message:', error);
+            statusElement.textContent = `Error: ${error.message}`;
+            statusElement.className = 'status error';
+          } finally {
+            // Reset button opacity
+            button.style.opacity = '1';
+            
+            // Clear status message after a delay
+            setTimeout(() => {
+              statusElement.textContent = 'Ready';
+              statusElement.className = 'status';
+            }, 3000);
+          }
+        });
+      });
+    });
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h1>Physarum OSC Controller</h1>
+    <div class="button-grid">
+      <button class="osc-button" data-address="/physarum/lastParam">Last Parameter</button>
+      <button class="osc-button" data-address="/physarum/nextParam">Next Parameter</button>
+      <button class="osc-button" data-address="/physarum/selectBg">Select Background</button>
+      <button class="osc-button" data-address="/physarum/selectFg">Select Foreground</button>
+      <button class="osc-button" data-address="/physarum/nextColor">Next Color</button>
+    </div>
+    <div id="status" class="status">Ready</div>
+  </div>
+</body>
+</html>

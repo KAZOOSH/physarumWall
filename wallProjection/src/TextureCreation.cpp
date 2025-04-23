@@ -11,7 +11,7 @@ TextureCreation::~TextureCreation()
 }
 
 void TextureCreation::setup(ofJson settings){
-    fbo.allocate(1920*3,1080);
+    fbo.allocate(settings["textureDim"][0],settings["textureDim"][1]);
 }
 
 ofTexture TextureCreation::getTexture()

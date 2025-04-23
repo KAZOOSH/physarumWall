@@ -5,6 +5,11 @@
 //--------------------------------------------------------------
 void Physarum::setup(ofJson settings){
     TextureCreation::setup(settings);
+
+    simulationWidth = settings["textureDim"][0];
+    simulationHeight = settings["textureDim"][1];
+
+
     ofSetFrameRate(FRAME_RATE);
 
     ofEnableAntiAliasing();
@@ -14,12 +19,12 @@ void Physarum::setup(ofJson settings){
     myFont.load("fonts/Raleway-Regular.ttf",floor(22.0 * u));
     myFontBold.load("fonts/Raleway-Bold.ttf",floor(22.0 * u));
 
-    counter.resize(SIMULATION_WIDTH*SIMULATION_HEIGHT);
+    counter.resize(simulationWidth*simulationHeight);
     counterBuffer.allocate(counter, GL_DYNAMIC_DRAW);
 
-    trailReadBuffer.allocate(SIMULATION_WIDTH, SIMULATION_HEIGHT, GL_RG16F);
-    trailWriteBuffer.allocate(SIMULATION_WIDTH, SIMULATION_HEIGHT, GL_RG16F);
-    fboDisplay.allocate(SIMULATION_WIDTH, SIMULATION_HEIGHT, GL_RGBA8);
+    trailReadBuffer.allocate(simulationWidth, simulationHeight, GL_RG16F);
+    trailWriteBuffer.allocate(simulationWidth, simulationHeight, GL_RG16F);
+    fboDisplay.allocate(simulationWidth, simulationHeight, GL_RGBA8);
 
     setterShader.setupShaderFromFile(GL_COMPUTE_SHADER,"shaders/computeshader_setter.glsl");
     setterShader.linkProgram();
@@ -33,13 +38,13 @@ void Physarum::setup(ofJson settings){
     blurShader.setupShaderFromFile(GL_COMPUTE_SHADER,"shaders/computeshader_blur.glsl");
     blurShader.linkProgram();
 
-    particles.resize(NUMBER_OF_PARTICLES * PARTICLE_PARAMETERS_COUNT);
+    particles.resize(settings["physarum"]["nParticles"].get<int>() * PARTICLE_PARAMETERS_COUNT);
     float marginx = 3;
     float marginy = 3;
 
-    for (int i = 0; i < NUMBER_OF_PARTICLES; i++) {
-        particles[PARTICLE_PARAMETERS_COUNT * i + 0] = floatAsUint16(ofRandom(marginx, SIMULATION_WIDTH - marginx) / SIMULATION_WIDTH);
-        particles[PARTICLE_PARAMETERS_COUNT * i + 1] = floatAsUint16(ofRandom(marginy, SIMULATION_HEIGHT - marginy) / SIMULATION_HEIGHT);
+    for (int i = 0; i < settings["physarum"]["nParticles"].get<int>(); i++) {
+        particles[PARTICLE_PARAMETERS_COUNT * i + 0] = floatAsUint16(ofRandom(marginx, simulationWidth - marginx) / simulationWidth);
+        particles[PARTICLE_PARAMETERS_COUNT * i + 1] = floatAsUint16(ofRandom(marginy, simulationHeight - marginy) / simulationHeight);
         particles[PARTICLE_PARAMETERS_COUNT * i + 2] = floatAsUint16(ofRandom(1));
         particles[PARTICLE_PARAMETERS_COUNT * i + 3] = floatAsUint16(ofRandom(1));
         particles[PARTICLE_PARAMETERS_COUNT * i + 4] = 0;
@@ -59,16 +64,16 @@ void Physarum::setup(ofJson settings){
 
     for(int i=0;i<MAX_NUMBER_OF_WAVES;i++)
     {
-        waveXarray[i] = SIMULATION_WIDTH/2;
-        waveYarray[i] = SIMULATION_HEIGHT/2;
+        waveXarray[i] = simulationWidth/2;
+        waveYarray[i] = simulationHeight/2;
         waveTriggerTimes[i] = -12345;
         waveSavedSigmas[i] = 0.5;
     }
 
     for(int i=0;i<MAX_NUMBER_OF_RANDOM_SPAWN;i++)
     {
-        randomSpawnXarray[i] = SIMULATION_WIDTH/2;
-        randomSpawnYarray[i] = SIMULATION_HEIGHT/2;
+        randomSpawnXarray[i] = simulationWidth/2;
+        randomSpawnYarray[i] = simulationHeight/2;
     }
 
 
@@ -114,7 +119,7 @@ void Physarum::update(){
     setterShader.setUniform1i("width",trailReadBuffer.getWidth());
     setterShader.setUniform1i("height",trailReadBuffer.getHeight());
     setterShader.setUniform1i("value",0);
-    setterShader.dispatchCompute(SIMULATION_WIDTH / 32, SIMULATION_HEIGHT / 32, 1);
+    setterShader.dispatchCompute(simulationWidth / 32, simulationHeight / 32, 1);
     setterShader.end();
 
 
@@ -162,7 +167,7 @@ void Physarum::update(){
     depositShader.setUniform1f("depositFactor",DEPOSIT_FACTOR);
     depositShader.setUniform1i("colorModeType",colorModeType);
     depositShader.setUniform1i("numberOfColorModes",NUMBER_OF_COLOR_MODES);
-    depositShader.dispatchCompute(SIMULATION_WIDTH / 32, SIMULATION_HEIGHT / 32, 1);
+    depositShader.dispatchCompute(simulationWidth / 32, simulationHeight / 32, 1);
     depositShader.end();
 
     trailReadBuffer.getTexture().bindAsImage(1,GL_WRITE_ONLY);
@@ -201,6 +206,7 @@ void Physarum::update(){
 		// check for mouse moved message
 		if(m.getAddress() == "/physarum/nextParam"){
             actionChangeParams(1);
+           // PointsDataManager.currentSelectionIndex
 		}
         else if(m.getAddress() == "/physarum/lastParam"){
             actionChangeParams(-1);
@@ -252,8 +258,8 @@ void Physarum::draw(){
 
         float R = currentActionAreaSizeSigma*600*(1.0 + 0.08*sin(0.4f*time2));
 
-        float cx = ofMap(curActionX,0,SIMULATION_WIDTH,0,ofGetWidth());
-        float cy = ofMap(curActionY,0,SIMULATION_HEIGHT,0,ofGetHeight());
+        float cx = ofMap(curActionX,0,simulationWidth,0,ofGetWidth());
+        float cy = ofMap(curActionY,0,simulationHeight,0,ofGetHeight());
 
         ofSetCircleResolution(100);
 
@@ -436,8 +442,8 @@ void Physarum::updateInputs(ofTouchEventArgs& t)
 }
 
 void Physarum::remapTouchPosition(ofTouchEventArgs& t){
-    t.x = ofMap(t.x, 0, ofGetWidth(), 0, SIMULATION_WIDTH, true);
-    t.y = ofMap(t.y, 0, ofGetHeight(), 0, SIMULATION_HEIGHT, true);
+    t.x = ofMap(t.x, 0, ofGetWidth(), 0, simulationWidth, true);
+    t.y = ofMap(t.y, 0, ofGetHeight(), 0, simulationHeight, true);
 }
 
 
@@ -473,8 +479,8 @@ void Physarum::onTouchDown(ofTouchEventArgs &ev)
     
     updateInputs(ev);
     
-    //curActionX = ofMap(ev.x, 0, ofGetWidth(), 0, SIMULATION_WIDTH, true);
-    //curActionY = ofMap(ev.y, 0, ofGetHeight(), 0, SIMULATION_HEIGHT, true);
+    //curActionX = ofMap(ev.x, 0, ofGetWidth(), 0, simulationWidth, true);
+    //curActionY = ofMap(ev.y, 0, ofGetHeight(), 0, simulationHeight, true);
 
     //actionTriggerWave();
     actionSpawnParticles(1);

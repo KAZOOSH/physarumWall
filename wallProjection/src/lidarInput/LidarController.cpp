@@ -148,7 +148,7 @@ void LidarController::onTouchUp(ofTouchEventArgs &ev)
 void LidarController::onTouchDown(ofTouchEventArgs &ev)
 {
     touches[ev.id] = ev;
-   // cout << "down ->" << ev.id << " : "<<ev.x << "  " << ev.y << endl;
+    cout << "down ->" << ev.id << " : "<<ev.x << "  " << ev.y << endl;
     mapTouchToTexCoords(ev);
     interactionStart.notify(ev);
     // updateTexture();

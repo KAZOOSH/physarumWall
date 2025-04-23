@@ -1,5 +1,10 @@
 ofxGui
+ofxGui
+ofxNetwork
 ofxNetwork
 ofxOpenCv
+ofxOpenCv
 ofxOsc
+ofxOsc
+ofxQuadWarp
 ofxQuadWarp

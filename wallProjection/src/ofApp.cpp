@@ -37,6 +37,22 @@ void ofApp::setup(){
 
     //receiver.setup(settings["network"]["port"]); 
 
+    // calculate texture size
+    int texW = 0;
+    int texH = 0;
+    for (auto& screen : settings["screens"]){
+        int texWt = screen["size"][0].get<int>() + screen["texturePosition"][0].get<int>(); 
+        int texHt = screen["size"][1].get<int>() + screen["texturePosition"][1].get<int>();
+        if(texWt > texW){
+            texW = texWt;
+        } 
+        if(texHt > texH){
+            texH = texHt;
+        } 
+    }
+    settings["textureDim"]={texW,texH};
+
+
     textureCreation = shared_ptr<Physarum>(new Physarum());
     textureCreation->setup(settings);
 
