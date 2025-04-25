@@ -56,11 +56,16 @@ void ofApp::setup(){
     textureCreation = shared_ptr<Physarum>(new Physarum());
     textureCreation->setup(settings);
 
+
+    mouseInput = shared_ptr<MouseInput>(new MouseInput());
+    mouseInput->setup(settings);
+
     
     controller = shared_ptr<LidarController>(new LidarController());
     controller->setup(settings);
 
     textureCreation->registerInputs(controller);
+    textureCreation->registerInputs(mouseInput);
     
 }
 

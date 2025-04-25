@@ -58,6 +58,7 @@ public:
   shared_ptr<Physarum> textureCreation;
 
   shared_ptr<LidarController> controller;
+  shared_ptr<MouseInput> mouseInput;
  // ofxOscReceiver receiver;
 };
 

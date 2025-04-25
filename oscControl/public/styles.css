@@ -2,7 +2,7 @@
     --primary-color: #464646;
     --primary-dark: #303030;
     --background-color: #010101;
-    --text-color: #2c3e50;
+    --text-color: #900a90;
     --success-color: #2ecc71;
     --error-color: #e74c3c;
   }
@@ -61,6 +61,59 @@
     transform: scale(0.98);
     color: rgb(92, 0, 104);
   }
+
+  .slider-container {
+    position: relative;
+    height: 40px;
+    margin: 20px 0;
+  }
+  
+  .slider-track {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100%;
+    height: 6px;
+    background-color: #ddd;
+    border-radius: 3px;
+  }
+  
+  .slider-range {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 6px;
+    background-color: rgb(162, 2, 183);
+    border-radius: 3px;
+  }
+  
+  .slider-handle {
+    position: absolute;
+    top: 50%;
+    width: 20px;
+    height: 20px;
+    background-color: rgb(162, 2, 183);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    z-index: 2;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  }
+  
+  .value-display {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+  
+  .value-box {
+    background-color: #f0f0f0;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-weight: bold;
+    width: 80px;
+    text-align: center;
+  }
   
   .status {
     text-align: center;
@@ -68,6 +121,13 @@
     font-size: 1rem;
     border-radius: 6px;
     background-color: rgba(255, 255, 255, 0.7);
+  }
+  .slider-description {
+    font-size: 1.1rem;
+    flex-grow: 1;
+    text-align: center;
+    color: #ffffff;
+    padding: 0 15px;
   }
   
   .status.success {

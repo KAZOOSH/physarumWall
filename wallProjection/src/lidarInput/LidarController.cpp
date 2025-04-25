@@ -77,36 +77,39 @@ void LidarController::updateTexture()
     ofClear(0, 0);
     ofSetColor(255, 0, 0);
 
+    for(auto& sensor : sensors){
+        auto samples = sensor->getSamples();
+        for (size_t i = 0; i < samples.size(); i++)
+        {
     
-    auto samples = sensors[0]->getSamples();
-    for (size_t i = 0; i < samples.size(); i++)
-    {
+    
+            float angle0;
+            if(sensor->isMirror){
+            angle0 = TWO_PI-(samples[i].angle_z_q14 *TWO_PI/65536) + (sensor->rotation * PI / 180);
+           }else{
+                angle0 = (samples[i].angle_z_q14 *TWO_PI/65536) + (sensor->rotation * PI / 180);
+            }
+            float angle1;
+            if(sensor->isMirror){
+                angle1 = TWO_PI - (samples[(i+1)% samples.size()].angle_z_q14* TWO_PI/65536) + (sensor->rotation * PI / 180);
+            }else{
+                angle1 = (samples[(i+1)% samples.size()].angle_z_q14* TWO_PI/65536)+ (sensor->rotation * PI / 180);
+            }
+                      
+    
+            auto m = screenMaps[0];
+            auto pos0 = ofVec2f(round(samples[i].dist_mm_q2*DIST_TO_MM * cos(angle0)), round(samples[i].dist_mm_q2 *DIST_TO_MM* sin(angle0))) + sensor->position;
+            pos0.x = ofMap(pos0.x,m.wallDim.x,m.wallDim.x+m.wallDim.width,m.screenDim.x,m.screenDim.x+m.screenDim.width);
+            pos0.y = ofMap(pos0.y,m.wallDim.y,m.wallDim.y+m.wallDim.height,m.screenDim.y,m.screenDim.y+m.screenDim.height);
+    
+            auto pos1 = ofVec2f(round(samples[(i + 1) % samples.size()].dist_mm_q2*DIST_TO_MM * cos(angle1)), round(samples[(i + 1) % samples.size()].dist_mm_q2 *DIST_TO_MM* sin(angle1))) + sensor->position;
+            pos1.x = ofMap(pos1.x,m.wallDim.x,m.wallDim.x+m.wallDim.width,m.screenDim.x,m.screenDim.x+m.screenDim.width);
+            pos1.y = ofMap(pos1.y,m.wallDim.y,m.wallDim.y+m.wallDim.height,m.screenDim.y,m.screenDim.y+m.screenDim.height);
+    
+            ofDrawLine(pos0.x,pos0.y,pos1.x,pos1.y);
+    }
 
-
-        float angle0;
-        if(sensors[0]->isMirror){
-        angle0 = TWO_PI-(samples[i].angle_z_q14 *TWO_PI/65536) + (sensors[0]->rotation * PI / 180);
-       }else{
-            angle0 = (samples[i].angle_z_q14 *TWO_PI/65536) + (sensors[0]->rotation * PI / 180);
-        }
-        float angle1;
-        if(sensors[0]->isMirror){
-            angle1 = TWO_PI - (samples[(i+1)% samples.size()].angle_z_q14* TWO_PI/65536) + (sensors[0]->rotation * PI / 180);
-        }else{
-            angle1 = (samples[(i+1)% samples.size()].angle_z_q14* TWO_PI/65536)+ (sensors[0]->rotation * PI / 180);
-        }
-                  
-
-        auto m = screenMaps[0];
-        auto pos0 = ofVec2f(round(samples[i].dist_mm_q2*DIST_TO_MM * cos(angle0)), round(samples[i].dist_mm_q2 *DIST_TO_MM* sin(angle0))) + sensors[0]->position;
-        pos0.x = ofMap(pos0.x,m.wallDim.x,m.wallDim.x+m.wallDim.width,m.screenDim.x,m.screenDim.x+m.screenDim.width);
-        pos0.y = ofMap(pos0.y,m.wallDim.y,m.wallDim.y+m.wallDim.height,m.screenDim.y,m.screenDim.y+m.screenDim.height);
-
-        auto pos1 = ofVec2f(round(samples[(i + 1) % samples.size()].dist_mm_q2*DIST_TO_MM * cos(angle1)), round(samples[(i + 1) % samples.size()].dist_mm_q2 *DIST_TO_MM* sin(angle1))) + sensors[0]->position;
-        pos1.x = ofMap(pos1.x,m.wallDim.x,m.wallDim.x+m.wallDim.width,m.screenDim.x,m.screenDim.x+m.screenDim.width);
-        pos1.y = ofMap(pos1.y,m.wallDim.y,m.wallDim.y+m.wallDim.height,m.screenDim.y,m.screenDim.y+m.screenDim.height);
-
-        ofDrawLine(pos0.x,pos0.y,pos1.x,pos1.y);
+    
     }
 /*
     auto c = sensors[0]->getClusters();

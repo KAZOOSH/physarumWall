@@ -109,6 +109,8 @@ private:
     std::map<u_int64_t, Cluster> clusters;
     ofxUDPManager udpReceiver;
     u_int64_t currentClusterId = 0;
+    u_int64_t minClusterId = 0;
+    u_int64_t maxClusterId = 65573;
 
     //
     u_int64_t tScanStarted = 0;

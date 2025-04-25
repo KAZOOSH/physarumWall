@@ -61,13 +61,28 @@
   <div class="container">
     <h1>Physarum OSC Controller</h1>
     <div class="button-grid">
-      <button class="osc-button" data-address="/physarum/lastParam">Last Parameter</button>
-      <button class="osc-button" data-address="/physarum/nextParam">Next Parameter</button>
-      <button class="osc-button" data-address="/physarum/selectBg">Select Background</button>
-      <button class="osc-button" data-address="/physarum/selectFg">Select Foreground</button>
+      <button class="osc-button" data-address="/physarum/nextBg">Last Background</button>
+      <button class="osc-button" data-address="/physarum/nextBg">Next Background</button>
+      <button class="osc-button" data-address="/physarum/lastFg">Last Foreground</button>
+      <button class="osc-button" data-address="/physarum/nextFg">Next Foreground</button>
       <button class="osc-button" data-address="/physarum/nextColor">Next Color</button>
     </div>
+
+    <div class="slider-container">
+      <div class="slider-track"></div>
+      <div class="slider-range"></div>
+      <div class="slider-handle min-handle" id="min-handle"></div>
+      <div class="slider-handle max-handle" id="max-handle"></div>
+    </div>
+    <div class="value-display">
+      <div class="value-box" id="min-value">0</div>
+      <div class="slider-description">seconds to change scenario</div>
+      <div class="value-box" id="max-value">100</div>
+    </div>
+
+
     <div id="status" class="status">Ready</div>
   </div>
+  <script src="script.js"></script>
 </body>
 </html>

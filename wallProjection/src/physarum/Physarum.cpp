@@ -84,6 +84,9 @@ void Physarum::setup(ofJson settings){
     paramsUpdate();
 
     receiver.setup(settings["network"]["port"].get<int>());
+
+    minTScenarioChange = settings["physarum"]["tminChangeScenario"].get<int>()*1000;
+    maxTScenarioChange = settings["physarum"]["tmaxCangeScenario"].get<int>()*1000;
 }
 
 void Physarum::paramsUpdate()
@@ -217,13 +220,39 @@ void Physarum::update(){
         else if(m.getAddress() == "/physarum/selectFg"){
             pointsDataManager.changeSelectionIndex(1);
 		}
+        else if(m.getAddress() == "/physarum/nextBg"){
+            pointsDataManager.changeSelectionIndex(-1);
+            actionChangeParams(1);
+		}
+        else if(m.getAddress() == "/physarum/lastBg"){
+            pointsDataManager.changeSelectionIndex(-1);
+            actionChangeParams(-1);
+		}
+        else if(m.getAddress() == "/physarum/nextFg"){
+            pointsDataManager.changeSelectionIndex(1);
+            actionChangeParams(1);
+		}
+        else if(m.getAddress() == "/physarum/lastFg"){
+            pointsDataManager.changeSelectionIndex(1);
+            actionChangeParams(-1);
+		}
         else if(m.getAddress() == "/physarum/nextColor"){
             actionChangeColorMode();
-            cout<< "nextColor" <<endl;
+		}
+        else if(m.getAddress() == "/physarum/setMinTimeScenarioChange"){
+            minTScenarioChange = m.getArgAsInt(0)*1000;
+		}
+        else if(m.getAddress() == "/physarum/setMaxTimeScenarioChange"){
+            maxTScenarioChange = m.getArgAsInt(0)*1000;
+            //cout << maxTScenarioChange <<endl;
 		}
 
         
 	}
+
+    if(ofGetElapsedTimeMillis() > nextChangeScenario){
+        changeScenario();
+    }
 
     fbo.begin();
     ofPushMatrix();
@@ -423,7 +452,10 @@ void Physarum::updateInputs(ofTouchEventArgs& t)
             actionsX[count] = get<1>(touch.second).x;
             actionsY[count] = get<1>(touch.second).y;
             if(t.type == ofTouchEventArgs::down && get<1>(touch.second) == t){
-                spawn[count] = 1;
+                spawn[count] = round(ofRandom(1))+1;
+                if(spawn[count] == 2){
+                    setRandomSpawn();
+                }
             }
             else{
                 spawn[count] = 0;
@@ -439,6 +471,7 @@ void Physarum::updateInputs(ofTouchEventArgs& t)
             spawn[i] = 0;
         }
     }
+    //cout << actionsX[0] << " , " << actionsY[0] << endl;
 }
 
 void Physarum::remapTouchPosition(ofTouchEventArgs& t){
@@ -468,7 +501,6 @@ void Physarum::onTouchDown(ofTouchEventArgs &ev)
     tuple<long,ofTouchEventArgs> t {ofGetElapsedTimeMillis(),ev};
     touches[ev.id] = t;
 
-    cout << "down ->" << ev.id << " : "<<ev.x << "  " << ev.y << endl;
 
    /* cout << " start : " <<endl;
     for (auto& touch:touches)
@@ -502,6 +534,7 @@ void Physarum::onTouchUp(ofTouchEventArgs &ev)
 
 void Physarum::onTouchMove(ofTouchEventArgs &ev)
 {
+   // cout << ev.x << " , " <<ev.y <<endl;
     remapTouchPosition(ev);
     tuple<long,ofTouchEventArgs> t {ofGetElapsedTimeMillis(),ev};
     touches[ev.id] = t;
@@ -509,4 +542,24 @@ void Physarum::onTouchMove(ofTouchEventArgs &ev)
 
 
     updateInputs(ev);
+}
+
+void Physarum::changeScenario()
+{
+    int nextAction = ofRandom(10);
+    // nextbg
+    if(nextAction < 4){
+        pointsDataManager.changeSelectionIndex(-1);
+        actionChangeParams(1);
+    } 
+    // lastFG
+    else if(nextAction <8){
+        pointsDataManager.changeSelectionIndex(1);
+            actionChangeParams(-1);
+    }
+    // next color
+    else{
+        actionChangeColorMode();
+    }
+    nextChangeScenario = ofGetElapsedTimeMillis() + ofRandom(minTScenarioChange,maxTScenarioChange);
 }

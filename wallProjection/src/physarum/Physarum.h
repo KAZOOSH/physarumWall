@@ -43,6 +43,8 @@ public:
     void onTouchUp(ofTouchEventArgs& ev) override;
     void onTouchMove(ofTouchEventArgs& ev) override;
 
+    void changeScenario();
+
     PointsDataManager pointsDataManager; // loading initial stuff with PointsDataManager::PointsDataManager()
     void paramsUpdate();
 
@@ -55,6 +57,7 @@ public:
     float getTime();
     float currentTransitionProgress();
     bool activeTransition();
+
 
     void actionChangeSigmaCount(int dir);
     void actionChangeParams(int dir);
@@ -131,6 +134,13 @@ public:
 
     int simulationWidth;
     int simulationHeight;
+
+    bool isAutoSwitchScenario = true;
+
+    long lastChangeScenario = 0;
+    long nextChangeScenario = 30000;
+    int minTScenarioChange = 20000;
+    int maxTScenarioChange = 80000;
 
 
     // int numFrames = 4000;

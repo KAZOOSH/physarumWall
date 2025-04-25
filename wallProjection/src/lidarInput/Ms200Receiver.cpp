@@ -22,6 +22,9 @@ void Ms200Receiver::setup(ofJson settings)
                                  settings["screen"]["worldDimensions"]["height"].get<float>());
     rotation = settings["lidar"]["rotation"].get<float>();
     isMirror = settings["lidar"]["mirror"].get<bool>();
+    minClusterId = settings["lidar"]["minClusterId"].get<int>();
+    maxClusterId = settings["lidar"]["maxClusterId"].get<int>();
+    currentClusterId = minClusterId;
 
     // load environment
     ofBuffer buffer = ofBufferFromFile(settings["lidar"]["environmentFile"].get<string>().c_str());
@@ -303,6 +306,9 @@ void Ms200Receiver::updateClusters(map<u_int64_t, Cluster> &clusters, const map<
         if (!isTracked)
         {
             ++currentClusterId;
+            if(currentClusterId >= maxClusterId){
+                currentClusterId = minClusterId;
+            }
         }
         clusters.insert(make_pair(id, tClusters[i]));
     }

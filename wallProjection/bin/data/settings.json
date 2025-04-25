@@ -2,10 +2,25 @@
     "lidars": [
         {
             "environmentFile": "env_left.txt",
+            "maxClusterId": 715827882,
+            "minClusterId": 0,
             "mirror": true,
-            "port": 40001,
+            "port": 40013,
             "position": [
-                950,
+                900,
+                0
+            ],
+            "rotation": 0,
+            "screenId": "left"
+        },
+        {
+            "environmentFile": "env_center.txt",
+            "maxClusterId": 1431655765,
+            "minClusterId": 715827883,
+            "mirror": true,
+            "port": 40002,
+            "position": [
+                900,
                 0
             ],
             "rotation": 0,
@@ -18,7 +33,9 @@
         "port": 8888
     },
     "physarum": {
-        "nParticles": 5767168
+        "nParticles": 5767168,
+        "tmaxCangeScenario": 80,
+        "tminChangeScenario": 20
     },
     "quadwarp": {
         "0": {

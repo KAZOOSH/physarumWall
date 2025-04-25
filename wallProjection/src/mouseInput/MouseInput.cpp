@@ -31,6 +31,15 @@ void MouseInput::mouseReleased(ofMouseEventArgs &args)
     updateTexture(args);
 }
 
+void MouseInput::mouseMoved(ofMouseEventArgs &args)
+{
+
+        ofTouchEventArgs t = ofTouchEventArgs(ofTouchEventArgs::move, args.x, args.y, currentId);
+        interactionMove.notify(t);
+        updateTexture(args);
+
+}
+
 void MouseInput::keyPressed(ofKeyEventArgs &args)
 {
     switch (args.key)
@@ -65,11 +74,4 @@ void MouseInput::updateTexture(ofMouseEventArgs &args)
     debugFbo.end();
 }
 
-void MouseInput::mouseMoved(ofMouseEventArgs &args)
-{
 
-        ofTouchEventArgs t = ofTouchEventArgs(ofTouchEventArgs::move, args.x, args.y, currentId);
-        interactionMove.notify(t);
-        updateTexture(args);
-
-}

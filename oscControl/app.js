@@ -37,6 +37,23 @@ app.post('/send-osc', (req, res) => {
   res.json({ success: true, message: `OSC message sent to ${address}` });
 });
 
+
+// API endpoint for sending OSC messages with arguments
+app.post('/send-osc-with-args', (req, res) => {
+  const { address, args } = req.body;
+  
+  if (!address) {
+    return res.status(400).json({ error: 'OSC address required' });
+  }
+
+  // Send the OSC message with arguments
+  client.send(address, args, () => {
+    console.log(`Sent OSC message to ${address} with args: ${JSON.stringify(args)}`);
+  });
+
+  res.json({ success: true, message: `OSC message sent to ${address} with args: ${JSON.stringify(args)}` });
+});
+
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

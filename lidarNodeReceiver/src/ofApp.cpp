@@ -20,7 +20,7 @@ void ofApp::setup()
 
 	values.resize(6000);
 
-	receiver = shared_ptr<Ms200Receiver>(new Ms200Receiver(40001, "env.txt"));
+	receiver = shared_ptr<Ms200Receiver>(new Ms200Receiver(40013, "env.txt"));
 
 	ofAddListener(receiver->interactionStart,this,&ofApp::onTouchEvent);
 	ofAddListener(receiver->interactionMove,this,&ofApp::onTouchEvent);
