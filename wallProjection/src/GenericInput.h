@@ -24,6 +24,8 @@ public:
     ofEvent<ofTouchEventArgs> interactionMove;
 
     void onTouchOscTouch(ofTouchEventArgs& args);
+
+    ofEvent<ofxOscMessage> newOscMessageEvent;
 protected:
    
 
@@ -31,7 +33,6 @@ protected:
     ofFbo debugFbo;
 
 private:
-    ofxOscSender sender;
 
 };
 

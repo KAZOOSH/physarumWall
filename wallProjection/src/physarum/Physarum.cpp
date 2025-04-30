@@ -83,7 +83,6 @@ void Physarum::setup(ofJson settings){
 
     paramsUpdate();
 
-    receiver.setup(settings["network"]["port"].get<int>());
 
     minTScenarioChange = settings["physarum"]["tminChangeScenario"].get<int>()*1000;
     maxTScenarioChange = settings["physarum"]["tmaxCangeScenario"].get<int>()*1000;
@@ -199,57 +198,7 @@ void Physarum::update(){
     ofSetWindowTitle(strm.str());
 
 
-    // check for waiting messages
-	while(receiver.hasWaitingMessages()){
-
-		// get the next message
-		ofxOscMessage m;
-		receiver.getNextMessage(m);
-
-		// check for mouse moved message
-		if(m.getAddress() == "/physarum/nextParam"){
-            actionChangeParams(1);
-           // PointsDataManager.currentSelectionIndex
-		}
-        else if(m.getAddress() == "/physarum/lastParam"){
-            actionChangeParams(-1);
-		}
-        else if(m.getAddress() == "/physarum/selectBg"){
-            pointsDataManager.changeSelectionIndex(-1);
-		}
-        else if(m.getAddress() == "/physarum/selectFg"){
-            pointsDataManager.changeSelectionIndex(1);
-		}
-        else if(m.getAddress() == "/physarum/nextBg"){
-            pointsDataManager.changeSelectionIndex(-1);
-            actionChangeParams(1);
-		}
-        else if(m.getAddress() == "/physarum/lastBg"){
-            pointsDataManager.changeSelectionIndex(-1);
-            actionChangeParams(-1);
-		}
-        else if(m.getAddress() == "/physarum/nextFg"){
-            pointsDataManager.changeSelectionIndex(1);
-            actionChangeParams(1);
-		}
-        else if(m.getAddress() == "/physarum/lastFg"){
-            pointsDataManager.changeSelectionIndex(1);
-            actionChangeParams(-1);
-		}
-        else if(m.getAddress() == "/physarum/nextColor"){
-            actionChangeColorMode();
-		}
-        else if(m.getAddress() == "/physarum/setMinTimeScenarioChange"){
-            minTScenarioChange = m.getArgAsInt(0)*1000;
-		}
-        else if(m.getAddress() == "/physarum/setMaxTimeScenarioChange"){
-            maxTScenarioChange = m.getArgAsInt(0)*1000;
-            //cout << maxTScenarioChange <<endl;
-		}
-
-        
-	}
-
+    
     if(ofGetElapsedTimeMillis() > nextChangeScenario){
         changeScenario();
     }
@@ -544,22 +493,104 @@ void Physarum::onTouchMove(ofTouchEventArgs &ev)
     updateInputs(ev);
 }
 
+void Physarum::onOscMessage(ofxOscMessage m)
+{
+		// check for mouse moved message
+		if(m.getAddress() == "/physarum/nextParam"){
+            sendChangeScenario();
+            actionChangeParams(1);
+           // PointsDataManager.currentSelectionIndex
+		}
+        else if(m.getAddress() == "/physarum/lastParam"){
+            actionChangeParams(-1);
+            sendChangeScenario();
+		}
+        else if(m.getAddress() == "/physarum/selectBg"){
+            pointsDataManager.currentSelectionIndex = 0;
+		}
+        else if(m.getAddress() == "/physarum/selectFg"){
+            pointsDataManager.currentSelectionIndex = 1;
+		}
+        else if(m.getAddress() == "/physarum/nextBg"){
+            pointsDataManager.currentSelectionIndex = 0;
+            actionChangeParams(1);
+            sendChangeScenario();
+		}
+        else if(m.getAddress() == "/physarum/lastBg"){
+            pointsDataManager.currentSelectionIndex = 0;
+            actionChangeParams(-1);
+            sendChangeScenario();
+		}
+        else if(m.getAddress() == "/physarum/nextFg"){
+            pointsDataManager.currentSelectionIndex = 1;
+            actionChangeParams(1);
+            sendChangeScenario();
+		}
+        else if(m.getAddress() == "/physarum/lastFg"){
+            pointsDataManager.currentSelectionIndex = 1;
+            actionChangeParams(-1);
+            sendChangeScenario();
+		}
+        else if(m.getAddress() == "/physarum/nextColor"){
+            actionChangeColorMode();
+		}
+        else if(m.getAddress() == "/physarum/setMinTimeScenarioChange"){
+            minTScenarioChange = m.getArgAsInt(0)*1000;
+		}
+        else if(m.getAddress() == "/physarum/setMaxTimeScenarioChange"){
+            maxTScenarioChange = m.getArgAsInt(0)*1000;
+            //cout << maxTScenarioChange <<endl;
+		}
+}
+
 void Physarum::changeScenario()
 {
     int nextAction = ofRandom(10);
     // nextbg
     if(nextAction < 4){
-        pointsDataManager.changeSelectionIndex(-1);
+        pointsDataManager.currentSelectionIndex = 0;
         actionChangeParams(1);
+        sendChangeScenario();
     } 
     // lastFG
     else if(nextAction <8){
-        pointsDataManager.changeSelectionIndex(1);
+        pointsDataManager.currentSelectionIndex = 1;
             actionChangeParams(-1);
+            sendChangeScenario();
     }
     // next color
     else{
         actionChangeColorMode();
     }
     nextChangeScenario = ofGetElapsedTimeMillis() + ofRandom(minTScenarioChange,maxTScenarioChange);
+}
+
+void Physarum::sendChangeScenario()
+{            ofxOscMessage m;
+            m.setAddress("/midi/cc");
+            m.addIntArg(pointsDataManager.selectedIndices[pointsDataManager.getSelectionIndex()]+1);
+            m.addIntArg(127);
+            m.addIntArg(3);
+            ofNotifyEvent(newOscMessageEvent,m,this);
+
+            ofxOscMessage m2;
+            m2.setAddress("/midi/cc");
+            m2.addIntArg(0);
+            m2.addIntArg(pointsDataManager.selectedIndices[pointsDataManager.getSelectionIndex()]);
+            m2.addIntArg(0);
+            ofNotifyEvent(newOscMessageEvent,m2,this);
+
+            ofxOscMessage m3;
+            m3.setAddress("/midi/cc");
+            m3.addIntArg(0);
+            m3.addIntArg(pointsDataManager.selectedIndices[pointsDataManager.getSelectionIndex()]);
+            m3.addIntArg(1);
+            ofNotifyEvent(newOscMessageEvent,m3,this);
+
+            ofxOscMessage m4;
+            m4.setAddress("/midi/cc");
+            m4.addIntArg(0);
+            m4.addIntArg(pointsDataManager.selectedIndices[pointsDataManager.getSelectionIndex()]);
+            m4.addIntArg(2);
+            ofNotifyEvent(newOscMessageEvent,m4,this);
 }

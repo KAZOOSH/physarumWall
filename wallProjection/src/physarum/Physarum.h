@@ -43,7 +43,10 @@ public:
     void onTouchUp(ofTouchEventArgs& ev) override;
     void onTouchMove(ofTouchEventArgs& ev) override;
 
+    void onOscMessage(ofxOscMessage m) override;
+
     void changeScenario();
+    void sendChangeScenario();
 
     PointsDataManager pointsDataManager; // loading initial stuff with PointsDataManager::PointsDataManager()
     void paramsUpdate();

@@ -38,6 +38,8 @@ public:
     void keyPressedWindow3(ofKeyEventArgs& args);
     void keyPressedWindow4(ofKeyEventArgs& args);
     void exit();
+
+    void onOscSendEvent(ofxOscMessage& m);
     
     void drawScreen(int screenId);
     void processKeyPressedEvent(int key, int screenId);
@@ -45,6 +47,8 @@ public:
   
     
     ofxPanel panel;    
+    ofxOscReceiver receiver;
+    ofxOscSender sender;
     
     
     vector<ofxQuadWarp> warper;

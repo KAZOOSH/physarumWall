@@ -28,9 +28,33 @@
         }
     ],
     "network": {
-        "oscDst": "192.168.1.248",
-        "oscPort": 8000,
-        "port": 8888
+        "oscIpOut": "192.168.1.248",
+        "oscPortOut": 8000,
+        "oscPortIn": 8888,
+        "messages":{
+            "x":{
+                "left":{
+                    "channel":0,
+                    "note":[51,76]
+                },
+                "center":{
+                    "channel":1,
+                    "note":[25,50]
+                },
+                "right":{
+                    "channel":2,
+                    "note":[77,103]
+                }
+            },
+            "y":{
+                "note":[0,127],
+                "ccNumber":1
+            },
+            "sceneChange":{
+
+            }
+            
+        }
     },
     "physarum": {
         "nParticles": 5767168,

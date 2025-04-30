@@ -66,7 +66,16 @@ void ofApp::setup(){
 
     textureCreation->registerInputs(controller);
     textureCreation->registerInputs(mouseInput);
+
+
+    receiver.setup(settings["network"]["oscPortIn"].get<int>());
+    sender.setup(settings["network"]["oscIpOut"].get<std::string>().c_str(),settings["network"]["oscPortOut"].get<int>());
     
+
+    ofAddListener(textureCreation->newOscMessageEvent,this,&ofApp::onOscSendEvent);
+    ofAddListener(controller->newOscMessageEvent,this,&ofApp::onOscSendEvent);
+    ofAddListener(mouseInput->newOscMessageEvent,this,&ofApp::onOscSendEvent);
+
 }
 
 
@@ -75,7 +84,14 @@ void ofApp::update(){
     
     textureCreation->update();
     
-   
+   // check for waiting messages
+	while(receiver.hasWaitingMessages()){
+		// get the next message
+		ofxOscMessage m;
+		receiver.getNextMessage(m);
+        textureCreation->onOscMessage(m);
+	}
+
 }
 
 //--------------------------------------------------------------
@@ -134,7 +150,15 @@ void ofApp::exit()
     }
 }
 
-void ofApp::drawScreen(int screenId)
+void ofApp::onOscSendEvent(ofxOscMessage &m)
+{
+    sender.sendMessage(m, false);
+}
+
+
+
+
+void ofApp::drawScreen(int screenId) 
 {
     auto settingsScreen = settings["screens"][screenId];
 

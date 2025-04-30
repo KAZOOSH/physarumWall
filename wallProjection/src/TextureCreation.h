@@ -27,7 +27,8 @@ public:
     virtual void onTouchUp(ofTouchEventArgs& ev){};
     virtual void onTouchMove(ofTouchEventArgs& ev){};
 
-    ofxOscReceiver receiver;
+    virtual void onOscMessage(ofxOscMessage m){};
+    ofEvent<ofxOscMessage> newOscMessageEvent;
 
 protected:
     ofFbo fbo;
