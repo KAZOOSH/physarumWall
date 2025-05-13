@@ -12,9 +12,10 @@ int main()
 	//settings.setGLVersion(3,2);
 	// main window
 	settings.setSize(jSettings[0]["size"][0], jSettings[0]["size"][1]);
+	cout << jSettings[0]["position"][0] <<endl;
 	settings.setPosition(glm::vec2(jSettings[0]["position"][0], jSettings[0]["position"][1]));
-	settings.resizable = false;
-	settings.decorated = false;
+	settings.resizable = true;
+	settings.decorated = true;
 	//settings.transparent = true;
 	settings.title = jSettings[0]["id"].get<string>();
 
@@ -25,6 +26,7 @@ int main()
 	for (int i=1; i<jSettings.size();++i)
 	{
 		settings.setSize(jSettings[i]["size"][0], jSettings[i]["size"][1]);
+		cout << jSettings[i]["position"][0] <<endl;
 		settings.setPosition(glm::vec2(jSettings[i]["position"][0], jSettings[i]["position"][1]));
 		settings.shareContextWith = mainWindow;
 		settings.title = jSettings[i]["id"].get<string>();

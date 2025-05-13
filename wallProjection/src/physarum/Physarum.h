@@ -29,7 +29,7 @@
 #define ACTION_SIGMA_CHANGE_DURATION 0.26
 #define DIGITS_PRECISION 3
 #define MAX_NUMBER_OF_RANDOM_SPAWN 5
-#define MAX_NUMBER_OF_INPUTS 20
+#define MAX_NUMBER_OF_INPUTS 150
 
 
 class Physarum : public TextureCreation{
@@ -144,6 +144,11 @@ public:
     long nextChangeScenario = 30000;
     int minTScenarioChange = 20000;
     int maxTScenarioChange = 80000;
+
+
+    int wWall;
+    int hWall;
+
 
 
     // int numFrames = 4000;

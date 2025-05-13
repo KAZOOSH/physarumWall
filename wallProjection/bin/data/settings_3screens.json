@@ -6,19 +6,67 @@
             "port": 40001,
             "position": [
                 950,
-                500
+                0
             ],
             "rotation": 0,
             "screenId": "left"
+        },
+        {
+            "environmentFile": "env_center.txt",
+            "maxClusterId": 1431655765,
+            "minClusterId": 715827883,
+            "mirror": true,
+            "port": 40002,
+            "position": [
+                2800,
+                0
+            ],
+            "rotation": 0,
+            "screenId": "center"
+        },
+        {
+            "environmentFile": "env_center.txt",
+            "maxClusterId": 1431655765,
+            "minClusterId": 715827883,
+            "mirror": true,
+            "port": 40002,
+            "position": [
+                5000,
+                0
+            ],
+            "rotation": 0,
+            "screenId": "right"
         }
     ],
     "network": {
-        "oscDst": "192.168.1.248",
-        "oscPort": 8000,
-        "port": 8888
+        "oscIpOut": "192.168.1.248",
+        "oscPortOut": 8000,
+        "oscPortIn": 8888,
+        "messages":{
+            "x":{
+                "left":{
+                    "channel":0,
+                    "note":[51,76]
+                },
+                "center":{
+                    "channel":1,
+                    "note":[25,50]
+                },
+                "right":{
+                    "channel":2,
+                    "note":[77,103]
+                }
+            },
+            "y":{
+                "note":[0,127],
+                "ccNumber":1
+            }
+        }
     },
     "physarum": {
-        "nParticles": 17301504
+        "nParticles": 17301504,
+        "tmaxCangeScenario": 80,
+        "tminChangeScenario": 20
     },
     "quadwarp": {
         "0": {

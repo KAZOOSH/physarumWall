@@ -76,6 +76,8 @@ void ofApp::setup(){
     ofAddListener(controller->newOscMessageEvent,this,&ofApp::onOscSendEvent);
     ofAddListener(mouseInput->newOscMessageEvent,this,&ofApp::onOscSendEvent);
 
+    //ofSetWindowPosition(-1920,0);
+   // cout << ofg() <<endl;
 }
 
 
@@ -277,7 +279,7 @@ void ofApp::processKeyPressedEvent(int key, int screenId)
         ofToggleFullscreen();
     }
     if (key == 'q') {
-       
+        ofSetWindowPosition(0,0);
     }
 }
 

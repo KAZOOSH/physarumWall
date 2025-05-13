@@ -12,19 +12,6 @@
             ],
             "rotation": 0,
             "screenId": "left"
-        },
-        {
-            "environmentFile": "env_center.txt",
-            "maxClusterId": 1431655765,
-            "minClusterId": 715827883,
-            "mirror": true,
-            "port": 40002,
-            "position": [
-                900,
-                0
-            ],
-            "rotation": 0,
-            "screenId": "left"
         }
     ],
     "network": {
@@ -49,11 +36,7 @@
             "y":{
                 "note":[0,127],
                 "ccNumber":1
-            },
-            "sceneChange":{
-
             }
-            
         }
     },
     "physarum": {

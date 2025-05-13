@@ -9,6 +9,18 @@ void Physarum::setup(ofJson settings){
     simulationWidth = settings["textureDim"][0];
     simulationHeight = settings["textureDim"][1];
 
+    hWall = 0;
+    wWall = 0;
+
+    for (auto& w:settings["screens"])
+    {
+        if(hWall < w["worldDimensions"]["height"].get<int>()){
+            hWall = w["worldDimensions"]["height"].get<int>();
+        }
+        wWall += w["worldDimensions"]["width"].get<int>();
+    }
+    cout << "hw " << wWall << "  " <<hWall <<endl;
+    
 
     ofSetFrameRate(FRAME_RATE);
 
@@ -195,7 +207,7 @@ void Physarum::update(){
 
     std::stringstream strm;
     strm << "fps: " << ofGetFrameRate();
-    ofSetWindowTitle(strm.str());
+    //ofSetWindowTitle(strm.str());
 
 
     
@@ -424,8 +436,8 @@ void Physarum::updateInputs(ofTouchEventArgs& t)
 }
 
 void Physarum::remapTouchPosition(ofTouchEventArgs& t){
-    t.x = ofMap(t.x, 0, ofGetWidth(), 0, simulationWidth, true);
-    t.y = ofMap(t.y, 0, ofGetHeight(), 0, simulationHeight, true);
+    t.x = ofMap(t.x, 0, wWall, 0, simulationWidth*1.5, true);
+    t.y = ofMap(t.y, 0, hWall, 0, simulationHeight*1.5, true);
 }
 
 
