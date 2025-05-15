@@ -20,6 +20,7 @@ void MouseInput::setup(ofJson settings)
 void MouseInput::mousePressed(ofMouseEventArgs &args)
 {
     ofTouchEventArgs t = ofTouchEventArgs(ofTouchEventArgs::down, args.x, args.y, currentId);
+    
     interactionStart.notify(t);
     updateTexture(args);
 }

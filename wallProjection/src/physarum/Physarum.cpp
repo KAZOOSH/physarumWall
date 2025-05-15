@@ -407,8 +407,18 @@ bool Physarum::activeTransition()
 
 void Physarum::updateInputs(ofTouchEventArgs& t)
 {
+    // Create a vector from the map entries
+    std::vector<std::pair<int, std::tuple<long, ofTouchEventArgs>>> vec(touches.begin(), touches.end());
+    
+    // Sort the vector by the long value in descending order (largest first)
+    std::sort(vec.begin(), vec.end(), 
+              [](const auto& a, const auto& b) {
+                  return std::get<0>(a.second) > std::get<0>(b.second);
+              });
+
+
     int count = 0;
-    for(auto& touch:touches){
+    for(auto& touch:vec){
         if(count < MAX_NUMBER_OF_INPUTS){
             actionsX[count] = get<1>(touch.second).x;
             actionsY[count] = get<1>(touch.second).y;
@@ -443,32 +453,11 @@ void Physarum::remapTouchPosition(ofTouchEventArgs& t){
 
 void Physarum::onTouchDown(ofTouchEventArgs &ev)
 {
-   /* switch (button)
-    {
-    case 0:
-        actionSpawnParticles(2);
-        break;
-    case 2:
-        actionSpawnParticles(1);
-        break;
-    case 1:
-        actionTriggerWave();
-        break;
-    }
-*/
 
 
     remapTouchPosition(ev);
     tuple<long,ofTouchEventArgs> t {ofGetElapsedTimeMillis(),ev};
     touches[ev.id] = t;
-
-
-   /* cout << " start : " <<endl;
-    for (auto& touch:touches)
-    {
-        cout << touch.first << "  " << get<0>(touch.second) <<endl;
-    }
-    cout << endl;*/
     
     updateInputs(ev);
     

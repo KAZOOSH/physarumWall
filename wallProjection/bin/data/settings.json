@@ -15,29 +15,41 @@
         }
     ],
     "network": {
-        "oscIpOut": "192.168.1.248",
-        "oscPortOut": 8000,
-        "oscPortIn": 8888,
-        "messages":{
-            "x":{
-                "left":{
-                    "channel":0,
-                    "note":[51,76]
+        "messages": {
+            "x": {
+                "center": {
+                    "channel": 1,
+                    "note": [
+                        25,
+                        50
+                    ]
                 },
-                "center":{
-                    "channel":1,
-                    "note":[25,50]
+                "left": {
+                    "channel": 0,
+                    "note": [
+                        51,
+                        76
+                    ]
                 },
-                "right":{
-                    "channel":2,
-                    "note":[77,103]
+                "right": {
+                    "channel": 2,
+                    "note": [
+                        77,
+                        103
+                    ]
                 }
             },
-            "y":{
-                "note":[0,127],
-                "ccNumber":1
+            "y": {
+                "ccNumber": 1,
+                "note": [
+                    0,
+                    127
+                ]
             }
-        }
+        },
+        "oscIpOut": "192.168.1.248",
+        "oscPortIn": 8888,
+        "oscPortOut": 8000
     },
     "physarum": {
         "nParticles": 5767168,
