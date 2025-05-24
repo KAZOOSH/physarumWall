@@ -1,19 +1,19 @@
-#include "Ms200Receiver.h"
+#include "Ms200ReceiverSimple.h"
 
 using namespace std::chrono_literals;
 using namespace std;
 
-Ms200Receiver::Ms200Receiver()
+Ms200ReceiverSimple::Ms200ReceiverSimple()
 {
 }
 
-Ms200Receiver::~Ms200Receiver()
+Ms200ReceiverSimple::~Ms200ReceiverSimple()
 {
     stop();
     waitForThread(false);
 }
 
-void Ms200Receiver::setup(ofJson settings)
+void Ms200ReceiverSimple::setup(ofJson settings)
 {
     position = ofVec2f(settings["lidar"]["position"][0].get<float>(), settings["lidar"]["position"][1].get<float>());
     wallDimensions = ofRectangle(settings["screen"]["worldDimensions"]["x"].get<float>(),
@@ -58,7 +58,17 @@ void Ms200Receiver::setup(ofJson settings)
     start();
 }
 
-void Ms200Receiver::updateValues(map<int, LidarRawSample> &db, vector<LidarRawSample> newSamples)
+void Ms200ReceiverSimple::update()
+{
+    newFrame = false;
+    while(filtered.tryReceive(samplesFilteredCartesian)){
+        newFrame = true;
+    };
+    
+
+}
+
+void Ms200ReceiverSimple::updateValues(map<int, LidarRawSample> &db, vector<LidarRawSample> newSamples)
 {
     int div = 65536 / N_TRACKING_POINTS;
     for (auto &sample : newSamples)
@@ -75,13 +85,13 @@ void Ms200Receiver::updateValues(map<int, LidarRawSample> &db, vector<LidarRawSa
     }
 }
 
-ofVec2f Ms200Receiver::polarToCartesian(uint16_t angle, uint32_t distance)
+ofVec2f Ms200ReceiverSimple::polarToCartesian(uint16_t angle, uint32_t distance)
 {
     float alpha = angle * TWO_PI / 65536;
     return ofVec2f(round(distance * cos(alpha)), round(distance * sin(alpha)));
 }
 
-ofVec2f Ms200Receiver::calculatePointOnWall(bool &isOnWall, uint16_t anglePoint, uint32_t distance)
+ofVec2f Ms200ReceiverSimple::calculatePointOnWall(bool &isOnWall, uint16_t anglePoint, uint32_t distance)
 {
     float alpha;
     if(isMirror){
@@ -94,7 +104,7 @@ ofVec2f Ms200Receiver::calculatePointOnWall(bool &isOnWall, uint16_t anglePoint,
     return pos;
 }
 
-vector<LidarRawSample> Ms200Receiver::convertCharArrayToLidarSamples(const char *buffer, size_t bufferSize)
+vector<LidarRawSample> Ms200ReceiverSimple::convertCharArrayToLidarSamples(const char *buffer, size_t bufferSize)
 {
     vector<LidarRawSample> samples;
 
@@ -122,7 +132,7 @@ vector<LidarRawSample> Ms200Receiver::convertCharArrayToLidarSamples(const char 
     return samples;
 }
 
-void Ms200Receiver::updateEnvironment(const map<int, LidarRawSample> &samples, map<int, LidarRawSample> &environment)
+void Ms200ReceiverSimple::updateEnvironment(const map<int, LidarRawSample> &samples, map<int, LidarRawSample> &environment)
 {
     for (auto &sample : samples)
     {
@@ -140,7 +150,10 @@ void Ms200Receiver::updateEnvironment(const map<int, LidarRawSample> &samples, m
     }
 }
 
-void Ms200Receiver::updateClusters(map<u_int64_t, Cluster> &clusters, const map<int, LidarRawSample> &samples, map<int, LidarRawSample> &environment)
+
+
+
+void Ms200ReceiverSimple::updateClusters(map<u_int64_t, Cluster> &clusters, const map<int, LidarRawSample> &samples, map<int, LidarRawSample> &environment)
 {
     // get non env points
     map<int, LidarRawSample> nonEnvPoints;
@@ -228,6 +241,14 @@ void Ms200Receiver::updateClusters(map<u_int64_t, Cluster> &clusters, const map<
 
         cl.meanAngle = atan2(alphaY, alphaX) * 65536 / TWO_PI;
         cl.meanDist = meanDist;
+
+        float dl = maxDist - minDist;
+        float meanD = minDist + dl * 0.5;
+        float alpha1 = minAngle * TWO_PI / 65536;
+        float alpha2 = maxAngle * TWO_PI / 65536;
+        float dr = sqrt(meanD * meanD + meanD * meanD - 2 * meanD * meanD * cos(alpha1 - alpha2));
+        cl.radius = max(dl, dr) * 0.5;
+
         tClusters.push_back(cl);
     }
 
@@ -386,10 +407,12 @@ void Ms200Receiver::updateClusters(map<u_int64_t, Cluster> &clusters, const map<
     }
 }
 
-void Ms200Receiver::threadedFunction()
+void Ms200ReceiverSimple::threadedFunction()
 {
+    std::vector<ofVec2f> samplesFilteredCartesian;
     while (isThreadRunning())
     {
+        
 
         // read message
         int lMsg = 4096;
@@ -400,7 +423,6 @@ void Ms200Receiver::threadedFunction()
         auto tPoints = convertCharArrayToLidarSamples(udpMessage, lMsg);
         if (tPoints.size() > 0)
         {
-            unique_lock<std::mutex> lock(std::mutex);
             updateValues(samples, tPoints);
 
             // start scanning timer when first received data
@@ -421,15 +443,17 @@ void Ms200Receiver::threadedFunction()
                     updateEnvironment(samples, environment);
                 }
             }
-
-            updateClusters(clusters, samples, environment);
+            filterNonEnvironmentPoints(samples,environment,samplesFilteredCartesian);
+            
+            filtered.send(std::move(samplesFilteredCartesian));
+            //updateClusters(clusters, samples, environment);
         }
 
         this_thread::sleep_for(10ms);
     }
 }
 
-std::vector<std::vector<int>> Ms200Receiver::createClusters(const std::map<int, int> &cpairs)
+std::vector<std::vector<int>> Ms200ReceiverSimple::createClusters(const std::map<int, int> &cpairs)
 {
     vector<set<int>> clusters;
 
@@ -467,4 +491,22 @@ std::vector<std::vector<int>> Ms200Receiver::createClusters(const std::map<int, 
     // cout << " ----------------" <<endl;
 
     return ret;
+}
+
+void Ms200ReceiverSimple::filterNonEnvironmentPoints(const std::map<int, LidarRawSample> &samples, std::map<int, LidarRawSample> &environment,std::vector<ofVec2f> &samplesFilteredCartesian)
+{
+    samplesFilteredCartesian.clear();
+     for (auto &sample : samples)
+     {
+         if (environment.at(sample.first).dist_mm_q2 > sample.second.dist_mm_q2 &&
+             environment.at(sample.first).dist_mm_q2 - sample.second.dist_mm_q2 > MIN_DIST_ENV)
+         {
+            bool isOnWall = false;
+            ofVec2f pos = calculatePointOnWall(isOnWall, sample.second.angle_z_q14,sample.second.dist_mm_q2);
+             if(isOnWall){
+                samplesFilteredCartesian.push_back(pos);
+             } 
+         }
+     }
+     //cout << samplesFilteredCartesian.size() <<endl;
 }

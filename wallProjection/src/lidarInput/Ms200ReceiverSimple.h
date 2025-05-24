@@ -1,5 +1,5 @@
-#ifndef MS200RECEIVER_H
-#define MS200RECEIVER_H
+#ifndef Ms200ReceiverSimple_H
+#define Ms200ReceiverSimple_H
 
 #pragma once
 
@@ -46,13 +46,14 @@ public:
     float dist;
 };
 
-class Ms200Receiver : public ofThread, public GenericInput
+class Ms200ReceiverSimple : public ofThread, public GenericInput
 {
 public:
-    Ms200Receiver();
-    ~Ms200Receiver();
+    Ms200ReceiverSimple();
+    ~Ms200ReceiverSimple();
 
     void setup(ofJson settings) override;
+    void update();
 
     /// Start the thread.
     void start()
@@ -66,8 +67,6 @@ public:
         stopThread();
         // condition.notify_all();
     }
-
-    
 
     const std::map<int, LidarRawSample> &getSamples() const
     {
@@ -84,6 +83,11 @@ public:
         return clusters;
     }
 
+    const std::vector<ofVec2f> &getFilteredSamples() const
+    {
+        return samplesFilteredCartesian;
+    }
+
     ofVec2f polarToCartesian(uint16_t angle, uint32_t distance);
     ofVec2f calculatePointOnWall(bool& isOnWall, uint16_t angle, uint32_t distance);
 
@@ -94,6 +98,7 @@ public:
     ofVec2f position;
     float rotation;
     bool isMirror;
+    
 
 private:
     std::vector<LidarRawSample> convertCharArrayToLidarSamples(const char *buffer, size_t bufferSize);
@@ -102,8 +107,13 @@ private:
     void updateClusters(std::map<u_int64_t, Cluster> &clusters, const std::map<int, LidarRawSample> &samples, std::map<int, LidarRawSample> &environment);
     std::vector<std::vector<int>> createClusters(const std::map<int, int> &cpairs);
 
+    void filterNonEnvironmentPoints(const std::map<int, LidarRawSample> &samples, std::map<int, LidarRawSample> &environment,std::vector<ofVec2f> &samplesFilteredCartesian);
+
     void threadedFunction();
 
+    std::vector<ofVec2f> samplesFilteredCartesian;
+    ofThreadChannel<std::vector<ofVec2f>> toFilter;
+    ofThreadChannel<std::vector<ofVec2f>> filtered;
     std::map<int, LidarRawSample> samples;
     std::map<int, LidarRawSample> environment;
     std::map<u_int64_t, Cluster> clusters;
@@ -115,6 +125,7 @@ private:
     //
     u_int64_t tScanStarted = 0;
     bool isScanningEnvironment = false;
+    bool newFrame;
 
     
 };

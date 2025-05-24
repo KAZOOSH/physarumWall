@@ -17,6 +17,7 @@ public:
     ~GenericInput();
 
     virtual void setup(ofJson settings);
+    virtual void update(){};
     ofTexture getDebugTexture(){return debugFbo.getTexture();};
 
     ofEvent<ofTouchEventArgs> interactionStart;

@@ -4,7 +4,7 @@ Interactive audiovisual physarum installation using
 and tracking through lidar sensors by
 [Lidar Toolset by Bernd Lintermann, ZKM | Karlsruhe](https://github.com/zkmkarlsruhe/lidar)
 
-The project is based on (openFrameworks 0.12)[https://openframeworks.cc/].
+The project is based on [openFrameworks 0.12](https://openframeworks.cc/).
 
 ## Installation
 ### Visual part

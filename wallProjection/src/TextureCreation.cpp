@@ -2,7 +2,6 @@
 
 TextureCreation::TextureCreation()
 {
-    
 }
 
 TextureCreation::~TextureCreation()

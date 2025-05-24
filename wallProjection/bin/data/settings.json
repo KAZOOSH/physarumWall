@@ -5,9 +5,22 @@
             "maxClusterId": 715827882,
             "minClusterId": 0,
             "mirror": true,
+            "port": 40001,
+            "position": [
+                2400,
+                0
+            ],
+            "rotation": 0,
+            "screenId": "left"
+        },
+        {
+            "environmentFile": "env_right.txt",
+            "maxClusterId": 715827882,
+            "minClusterId": 0,
+            "mirror": true,
             "port": 40013,
             "position": [
-                900,
+                1000,
                 0
             ],
             "rotation": 0,
@@ -20,22 +33,22 @@
                 "center": {
                     "channel": 1,
                     "note": [
-                        25,
-                        50
+                        36,
+                        60
                     ]
                 },
                 "left": {
                     "channel": 0,
                     "note": [
-                        51,
-                        76
+                        48,
+                        72
                     ]
                 },
                 "right": {
                     "channel": 2,
                     "note": [
-                        77,
-                        103
+                        60,
+                        84
                     ]
                 }
             },
@@ -47,12 +60,12 @@
                 ]
             }
         },
-        "oscIpOut": "192.168.1.248",
+        "oscIpOut": "192.168.1.242",
         "oscPortIn": 8888,
         "oscPortOut": 8000
     },
     "physarum": {
-        "nParticles": 5767168,
+        "nParticles": 18301504,
         "tmaxCangeScenario": 80,
         "tminChangeScenario": 20
     },
@@ -61,19 +74,19 @@
             "dst": [
                 {
                     "x": 0.0,
-                    "y": 0.0
+                    "y": 3.0
                 },
                 {
-                    "x": 1920.0,
-                    "y": 0.0
+                    "x": 1919.0,
+                    "y": 7.0
                 },
                 {
-                    "x": 1920.0,
-                    "y": 1080.0
+                    "x": 1917.0,
+                    "y": 1040.0
                 },
                 {
                     "x": 0.0,
-                    "y": 1080.0
+                    "y": 1035.0
                 }
             ],
             "src": [
@@ -113,8 +126,8 @@
                 0
             ],
             "worldDimensions": {
-                "height": 1100,
-                "width": 1900,
+                "height": 2000,
+                "width": 3400,
                 "x": 0,
                 "y": 0
             }

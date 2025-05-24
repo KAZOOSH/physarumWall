@@ -61,7 +61,7 @@ void ofApp::setup(){
     mouseInput->setup(settings);
 
     
-    controller = shared_ptr<LidarController>(new LidarController());
+    controller = shared_ptr<LidarControllerNew>(new LidarControllerNew());
     controller->setup(settings);
 
     textureCreation->registerInputs(controller);
@@ -85,6 +85,7 @@ void ofApp::setup(){
 void ofApp::update(){
     
     textureCreation->update();
+    controller->update();
     
    // check for waiting messages
 	while(receiver.hasWaitingMessages()){
@@ -106,7 +107,7 @@ void ofApp::draw(){
     if(isDebug){
         ofPushStyle();
         
-        panel.draw();
+       // panel.draw();
         ofPopStyle();
     }
 }
@@ -154,6 +155,7 @@ void ofApp::exit()
 
 void ofApp::onOscSendEvent(ofxOscMessage &m)
 {
+    // maybe as threaded sender
     sender.sendMessage(m, false);
 }
 
