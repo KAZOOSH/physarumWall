@@ -1,7 +1,6 @@
 #pragma once
 
 #include "ofMain.h"
-#include "ofxGui.h"
 #include "ofxQuadWarp.h"
 #include "ofxOsc.h"
 //#include "ofxOpenCv.h"
@@ -9,7 +8,7 @@
 
 #include "GenericInput.h"
 #include "MouseInput.h"
-#include "LidarControllerNew.h"
+#include "LidarController.h"
 
 class ofApp : public ofBaseApp{
     
@@ -44,9 +43,6 @@ public:
     void drawScreen(int screenId);
     void processKeyPressedEvent(int key, int screenId);
 
-  
-    
-    ofxPanel panel;    
     ofxOscReceiver receiver;
     ofxOscSender sender;
     
@@ -61,7 +57,7 @@ public:
 
   shared_ptr<Physarum> textureCreation;
 
-  shared_ptr<LidarControllerNew> controller;
+  shared_ptr<LidarController> controller;
   shared_ptr<MouseInput> mouseInput;
  // ofxOscReceiver receiver;
 };

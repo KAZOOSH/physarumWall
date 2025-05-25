@@ -3,11 +3,6 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
     settings = ofLoadJson("settings.json");
-    
-    panel.setup();
-    //panel.add(tileSize);
-    //panel.add(wallpaperGroup);
-    //panel.add(angle);
 
     // init warper
     int w = 0;
@@ -61,7 +56,7 @@ void ofApp::setup(){
     mouseInput->setup(settings);
 
     
-    controller = shared_ptr<LidarControllerNew>(new LidarControllerNew());
+    controller = shared_ptr<LidarController>(new LidarController());
     controller->setup(settings);
 
     textureCreation->registerInputs(controller);
@@ -289,20 +284,6 @@ void ofApp::processKeyPressedEvent(int key, int screenId)
 //--------------------------------------------------------------
 void ofApp::keyPressed  (int key){
     processKeyPressedEvent(key,0);
-    //manipulate inputs
-    /*if (key == 'm'){
-        ornament.setCellStructure(ornament.getCellStructure()+1);
-    }
-    if (key == 'n'){
-        ornament.setCellStructure(ornament.getCellStructure()-1);
-    }
-    if (key == 'c'){
-        int wg = ornament.getWallpaperGroupAsInt() + 1;
-        ornament.setWallpaperGroup(wg);
-    }
-    if (key == 'v'){
-        ornament.setWallpaperGroup(ornament.getWallpaperGroupAsInt()-1);
-    }*/
 }
 
 //--------------------------------------------------------------

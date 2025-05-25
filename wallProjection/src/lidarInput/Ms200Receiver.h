@@ -1,5 +1,5 @@
-#ifndef MS200RECEIVER_H
-#define MS200RECEIVER_H
+#ifndef Ms200Receiver_H
+#define Ms200Receiver_H
 
 #pragma once
 
@@ -53,6 +53,7 @@ public:
     ~Ms200Receiver();
 
     void setup(ofJson settings) override;
+    void update();
 
     /// Start the thread.
     void start()
@@ -64,10 +65,7 @@ public:
     {
         std::unique_lock<std::mutex> lck(mutex);
         stopThread();
-        // condition.notify_all();
     }
-
-    
 
     const std::map<int, LidarRawSample> &getSamples() const
     {
@@ -79,9 +77,9 @@ public:
         return environment;
     }
 
-    const std::map<u_int64_t, Cluster> &getClusters() const
+    const std::vector<ofVec2f> &getFilteredSamples() const
     {
-        return clusters;
+        return samplesFilteredCartesian;
     }
 
     ofVec2f polarToCartesian(uint16_t angle, uint32_t distance);
@@ -94,27 +92,29 @@ public:
     ofVec2f position;
     float rotation;
     bool isMirror;
+    
 
 private:
     std::vector<LidarRawSample> convertCharArrayToLidarSamples(const char *buffer, size_t bufferSize);
     void updateValues(std::map<int, LidarRawSample> &db, std::vector<LidarRawSample> newSamples);
     void updateEnvironment(const std::map<int, LidarRawSample> &samples, std::map<int, LidarRawSample> &environment);
-    void updateClusters(std::map<u_int64_t, Cluster> &clusters, const std::map<int, LidarRawSample> &samples, std::map<int, LidarRawSample> &environment);
     std::vector<std::vector<int>> createClusters(const std::map<int, int> &cpairs);
+
+    void filterNonEnvironmentPoints(const std::map<int, LidarRawSample> &samples, std::map<int, LidarRawSample> &environment,std::vector<ofVec2f> &samplesFilteredCartesian);
 
     void threadedFunction();
 
+    std::vector<ofVec2f> samplesFilteredCartesian;
+    ofThreadChannel<std::vector<ofVec2f>> toFilter;
+    ofThreadChannel<std::vector<ofVec2f>> filtered;
     std::map<int, LidarRawSample> samples;
     std::map<int, LidarRawSample> environment;
-    std::map<u_int64_t, Cluster> clusters;
     ofxUDPManager udpReceiver;
-    u_int64_t currentClusterId = 0;
-    u_int64_t minClusterId = 0;
-    u_int64_t maxClusterId = 65573;
 
     //
     u_int64_t tScanStarted = 0;
     bool isScanningEnvironment = false;
+    bool newFrame;
 
     
 };
