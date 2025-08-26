@@ -19,7 +19,7 @@ void Physarum::setup(ofJson settings){
         }
         wWall += w["worldDimensions"]["width"].get<int>();
     }
-    cout << "hw " << wWall << "  " <<hWall <<endl;
+    cout << "wh " << wWall << "  " <<hWall <<endl;
     
 
     ofSetFrameRate(FRAME_RATE);
@@ -446,18 +446,20 @@ void Physarum::updateInputs(ofTouchEventArgs& t)
 }
 
 void Physarum::remapTouchPosition(ofTouchEventArgs& t){
-    t.x = ofMap(t.x, 0, wWall, 0, simulationWidth*1.5, true);
-    t.y = ofMap(t.y, 0, hWall, 0, simulationHeight*1.5, true);
+    t.x = ofMap(t.x, 0, wWall, 0, simulationWidth*0.666, true);
+    t.y = ofMap(t.y, 0, hWall, 0, simulationHeight*0.666, true);
 }
 
 
 void Physarum::onTouchDown(ofTouchEventArgs &ev)
 {
-
+   // coudt << ev.x << " : " << ev.y;
 
     remapTouchPosition(ev);
     tuple<long,ofTouchEventArgs> t {ofGetElapsedTimeMillis(),ev};
     touches[ev.id] = t;
+
+   // cout << "   ->   " << ev.x << " : " << ev.y <<endl;
     
     updateInputs(ev);
     

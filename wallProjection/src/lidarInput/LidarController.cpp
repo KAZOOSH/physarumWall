@@ -1,4 +1,5 @@
 #include "LidarController.h"
+#include <type_traits>
 
 LidarController::LidarController()
 {
@@ -111,19 +112,21 @@ void LidarController::update()
             ofTouchEventArgs t = ofTouchEventArgs(ofTouchEventArgs::down, cluster.center.x, cluster.center.y, id);
             touchesNew.insert(make_pair(id, t));
         }
-
-        for (auto &e : touchLeave)
+    }
+    for (auto &e : touchLeave)
         {
+           // cout << "leave " << e <<endl;
             auto pos = touches[e].type = ofTouchEventArgs::up;
             ofTouchEventArgs t = ofTouchEventArgs(touches[e]);
-            mapTouchToTexCoords(t);
+            //mapTouchToTexCoords(t);
             interactionEnd.notify(t);
         }
 
         for (auto &e : touchEnter)
         {
+          //  cout << "enter " << e <<endl;
             ofTouchEventArgs t = ofTouchEventArgs(touchesNew[e]);
-            mapTouchToTexCoords(t);
+           // mapTouchToTexCoords(t);
             interactionStart.notify(t);
         }
 
@@ -132,11 +135,11 @@ void LidarController::update()
             if (ofVec2f(touchesNew[e].xspeed,touchesNew[e].yspeed).length() > 0)
             {
                 ofTouchEventArgs t = ofTouchEventArgs(touchesNew[e]);
-                mapTouchToTexCoords(t);
+               // mapTouchToTexCoords(t);
                 interactionMove.notify(t);
             }
         }
-    }
+
     touches = touchesNew;
 }
 
@@ -153,7 +156,7 @@ void LidarController::registerInputs(shared_ptr<GenericInput> input)
 void LidarController::onTouchMove(ofTouchEventArgs &ev)
 {
     touches[ev.id] = ev;
-    // cout << "move " << ev.x << "  " << ev.y << endl;
+     cout << "move " << ev.x << "  " << ev.y << endl;
     mapTouchToTexCoords(ev);
     interactionMove.notify(ev);
     // updateTexture();
@@ -277,9 +280,23 @@ void LidarController::updateTexture()
     ofClear(0, 0);
     
     int nSensor = 0;
+    // draw environment map
     for (auto &sensor : sensors)
     {
-        ofSetColor(50*nSensor, 50-(50*nSensor), 0);
+        switch (nSensor%3)
+        {
+        case 0:
+            ofSetColor(46,134,73);
+            break;
+        case 1:
+            ofSetColor(134,125,45);
+            break;
+        case 2:
+            ofSetColor(134,57,45);
+            break;
+        default:
+            break;
+        }
         auto samples = sensor->getEnvironment();
         for (size_t i = 0; i < samples.size(); i++)
         {
@@ -316,20 +333,77 @@ void LidarController::updateTexture()
         }
         nSensor++;
     }
-    ofSetColor(0, 255, 0);
+
+    nSensor = 0;
+    // draw environment map
+    for (auto &sensor : sensors)
+    {
+        switch (nSensor%3)
+        {
+        case 0:
+            ofSetColor(2,219,68);
+            break;
+        case 1:
+            ofSetColor(219,196,0);
+            break;
+        case 2:
+            ofSetColor(219,29,0);
+            break;
+        default:
+            break;
+        }
+        auto samples = sensor->getSamples();
+        for (size_t i = 0; i < samples.size(); i++)
+        {
+
+            float angle0;
+            if (sensor->isMirror)
+            {
+                angle0 = TWO_PI - (samples[i].angle_z_q14 * TWO_PI / 65536) + (sensor->rotation * PI / 180);
+            }
+            else
+            {
+                angle0 = (samples[i].angle_z_q14 * TWO_PI / 65536) + (sensor->rotation * PI / 180);
+            }
+            float angle1;
+            if (sensor->isMirror)
+            {
+                angle1 = TWO_PI - (samples[(i + 1) % samples.size()].angle_z_q14 * TWO_PI / 65536) + (sensor->rotation * PI / 180);
+            }
+            else
+            {
+                angle1 = (samples[(i + 1) % samples.size()].angle_z_q14 * TWO_PI / 65536) + (sensor->rotation * PI / 180);
+            }
+
+            auto m = screenMaps[0];
+            auto pos0 = ofVec2f(round(samples[i].dist_mm_q2 * DIST_TO_MM * cos(angle0)), round(samples[i].dist_mm_q2 * DIST_TO_MM * sin(angle0))) + sensor->position;
+            pos0.x = ofMap(pos0.x, m.wallDim.x, m.wallDim.x + m.wallDim.width, m.screenDim.x, m.screenDim.x + m.screenDim.width);
+            pos0.y = ofMap(pos0.y, m.wallDim.y, m.wallDim.y + m.wallDim.height, m.screenDim.y, m.screenDim.y + m.screenDim.height);
+
+            auto pos1 = ofVec2f(round(samples[(i + 1) % samples.size()].dist_mm_q2 * DIST_TO_MM * cos(angle1)), round(samples[(i + 1) % samples.size()].dist_mm_q2 * DIST_TO_MM * sin(angle1))) + sensor->position;
+            pos1.x = ofMap(pos1.x, m.wallDim.x, m.wallDim.x + m.wallDim.width, m.screenDim.x, m.screenDim.x + m.screenDim.width);
+            pos1.y = ofMap(pos1.y, m.wallDim.y, m.wallDim.y + m.wallDim.height, m.screenDim.y, m.screenDim.y + m.screenDim.height);
+
+            ofDrawLine(pos0.x, pos0.y, pos1.x, pos1.y);
+        }
+        nSensor++;
+    }
+
     for(auto& v:values){
         for (auto &m : screenMaps)
-    {
-        if (m.wallDim.inside(v))
         {
-            float x = ofMap(v.x, m.wallDim.x, m.wallDim.x + m.wallDim.width, m.screenDim.x, m.screenDim.x + m.screenDim.width);
-            float y = ofMap(v.y, m.wallDim.y, m.wallDim.y + m.wallDim.height, m.screenDim.y, m.screenDim.y + m.screenDim.height);
-            ofDrawRectangle(x,y,2,2);
+            if (m.wallDim.inside(v))
+            {
+                float x = ofMap(v.x, m.wallDim.x, m.wallDim.x + m.wallDim.width, m.screenDim.x, m.screenDim.x + m.screenDim.width);
+                float y = ofMap(v.y, m.wallDim.y, m.wallDim.y + m.wallDim.height, m.screenDim.y, m.screenDim.y + m.screenDim.height);
+                ofDrawRectangle(x,y,2,2);
+            }
         }
-    }
     }
 
     ofDrawBitmapString(ofToString(ofGetFrameRate()),10,10);
+
+    // draw touches
     int ty = 30;
     for (auto &touch : touches)
     {
@@ -352,14 +426,14 @@ void LidarController::onTouchUp(ofTouchEventArgs &ev)
     touches.erase(ev.id);
     mapTouchToTexCoords(ev);
     interactionEnd.notify(ev);
-    // cout << "up " << ev.x << "  " << ev.y << endl;
+     cout << "up " << ev.x << "  " << ev.y << endl;
     // updateTexture();
 }
 
 void LidarController::onTouchDown(ofTouchEventArgs &ev)
 {
     touches[ev.id] = ev;
-    // cout << "down ->" << ev.id << " : "<<ev.x << "  " << ev.y << endl;
+     cout << "down ->" << ev.id << " : "<<ev.x << "  " << ev.y << endl;
     mapTouchToTexCoords(ev);
     interactionStart.notify(ev);
     // updateTexture();

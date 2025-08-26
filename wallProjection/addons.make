@@ -1,5 +1,8 @@
 ofxNetwork
+ofxNetwork
+ofxOpenCv
 ofxOpenCv
 ofxOsc
+ofxOsc
 ofxQuadWarp
-
+ofxQuadWarp

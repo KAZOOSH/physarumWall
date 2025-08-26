@@ -7,7 +7,7 @@
 #include "points_management.h"
 #include "TextureCreation.h"
 
-#define SIMULATION_SCALE 0.66
+//#define SIMULATION_SCALE 0.66
 //#define SIMULATION_WIDTH 1280*3
 //#define SIMULATION_HEIGHT 736
 //#define NUMBER_OF_PARTICLES (512*512*22*3)

@@ -15,7 +15,7 @@ int main()
 	cout << jSettings[0]["position"][0] <<endl;
 	settings.setPosition(glm::vec2(jSettings[0]["position"][0], jSettings[0]["position"][1]));
 	settings.resizable = true;
-	settings.decorated = true;
+	settings.decorated = false;
 	//settings.transparent = true;
 	settings.title = jSettings[0]["id"].get<string>();
 

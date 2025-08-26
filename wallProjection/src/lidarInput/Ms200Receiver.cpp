@@ -23,6 +23,10 @@ void Ms200Receiver::setup(ofJson settings)
     rotation = settings["lidar"]["rotation"].get<float>();
     isMirror = settings["lidar"]["mirror"].get<bool>();
 
+    if(settings["lidar"]["minDistEnvironment"] != nullptr){
+        minDistEnvironment = settings["lidar"]["minDistEnvironment"].get<int>();
+    }
+
     // load environment
     ofBuffer buffer = ofBufferFromFile(settings["lidar"]["environmentFile"].get<string>().c_str());
     if (buffer.size())
@@ -94,8 +98,9 @@ ofVec2f Ms200Receiver::calculatePointOnWall(bool &isOnWall, uint16_t anglePoint,
     if(isMirror){
         alpha = TWO_PI-(anglePoint * TWO_PI / 65536) + (rotation * PI / 180);
     }else{
-    alpha = (anglePoint * TWO_PI / 65536) + (rotation * PI / 180);
+        alpha = (anglePoint * TWO_PI / 65536) + (rotation * PI / 180);
     } 
+    alpha = fmod(alpha,TWO_PI);
     auto pos = ofVec2f(round(distance*DIST_TO_MM * cos(alpha)), round(distance *DIST_TO_MM* sin(alpha))) + position;
     isOnWall = wallDimensions.inside(pos.x, pos.y);
     return pos;
@@ -198,7 +203,7 @@ void Ms200Receiver::filterNonEnvironmentPoints(const std::map<int, LidarRawSampl
      for (auto &sample : samples)
      {
          if (environment.at(sample.first).dist_mm_q2 > sample.second.dist_mm_q2 &&
-             environment.at(sample.first).dist_mm_q2 - sample.second.dist_mm_q2 > MIN_DIST_ENV)
+             environment.at(sample.first).dist_mm_q2 - sample.second.dist_mm_q2 > minDistEnvironment*10)
          {
             bool isOnWall = false;
             ofVec2f pos = calculatePointOnWall(isOnWall, sample.second.angle_z_q14,sample.second.dist_mm_q2);

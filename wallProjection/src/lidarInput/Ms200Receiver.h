@@ -18,7 +18,7 @@
 #define N_TRACKING_POINTS 448
 #define MS200_MAX_DIST 9000
 #define SCAN_TIME_MS 5000
-#define MIN_DIST_ENV 100
+#define MIN_DIST_ENV 10
 #define DIST_TO_MM 0.25
 
 class LidarRawSample
@@ -87,6 +87,7 @@ public:
 
     int maxDistPoints = 300;            // in mm
     int maxDistClustersTracking = 1000; // in mm
+    int minDistEnvironment = MIN_DIST_ENV; // in mm
 
     ofRectangle wallDimensions;
     ofVec2f position;

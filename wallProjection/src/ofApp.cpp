@@ -182,6 +182,7 @@ void ofApp::drawScreen(int screenId)
     //ofEnableBlendMode(OF_BLENDMODE_MULTIPLY);
     //ofSetColor(255,blendIntensity*255);
     if(isDebug){
+        ofSetColor(255);
         controller->updateTexture();
         controller->getDebugTexture().drawSubsection(
             ofRectangle(0, 0, settingsScreen["size"][0].get<int>(), settingsScreen["size"][1].get<int>()),

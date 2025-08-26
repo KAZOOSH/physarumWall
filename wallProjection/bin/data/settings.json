@@ -2,29 +2,39 @@
     "lidars": [
         {
             "environmentFile": "env_left.txt",
-            "maxClusterId": 715827882,
-            "minClusterId": 0,
-            "mirror": true,
-            "port": 40001,
-            "position": [
-                2400,
-                0
-            ],
-            "rotation": 0,
-            "screenId": "left"
-        },
-        {
-            "environmentFile": "env_right.txt",
-            "maxClusterId": 715827882,
-            "minClusterId": 0,
-            "mirror": true,
+            "mirror": false,
             "port": 40013,
             "position": [
-                1000,
-                0
+                1960,
+                -200
             ],
-            "rotation": 0,
-            "screenId": "left"
+            "rotation": 180,
+            "screenId": "left",
+            "minDistEnvironment":50
+        },
+        {
+            "environmentFile": "env_left.txt",
+            "mirror": false,
+            "port": 40001,
+            "position": [
+                4660,
+                -200
+            ],
+            "rotation": 180,
+            "screenId": "left",
+            "minDistEnvironment":50
+        },
+        {
+            "environmentFile": "env_center.txt",
+            "mirror": true,
+            "port": 40002,
+            "position": [
+                9850,
+                2300
+            ],
+            "rotation": 180,
+            "screenId": "right",
+            "minDistEnvironment":50
         }
     ],
     "network": {
@@ -60,12 +70,12 @@
                 ]
             }
         },
-        "oscIpOut": "192.168.1.242",
+        "oscIpOut": "192.168.1.243",
         "oscPortIn": 8888,
         "oscPortOut": 8000
     },
     "physarum": {
-        "nParticles": 18301504,
+        "nParticles": 28301504,
         "tmaxCangeScenario": 80,
         "tminChangeScenario": 20
     },
@@ -73,20 +83,58 @@
         "0": {
             "dst": [
                 {
+                    "x": 312.0,
+                    "y": 16.0
+                },
+                {
+                    "x": 1872.0,
+                    "y": 40.0
+                },
+                {
+                    "x": 1913.0,
+                    "y": 697.0
+                },
+                {
+                    "x": 297.0,
+                    "y": 797.0
+                }
+            ],
+            "src": [
+                {
                     "x": 0.0,
-                    "y": 3.0
+                    "y": 0.0
                 },
                 {
-                    "x": 1919.0,
-                    "y": 7.0
+                    "x": 1920.0,
+                    "y": 0.0
                 },
                 {
-                    "x": 1917.0,
-                    "y": 1040.0
+                    "x": 1920.0,
+                    "y": 1080.0
                 },
                 {
                     "x": 0.0,
-                    "y": 1035.0
+                    "y": 1080.0
+                }
+            ]
+        },
+        "1": {
+            "dst": [
+                {
+                    "x": 39.0,
+                    "y": 223.0
+                },
+                {
+                    "x": 1720.0,
+                    "y": 224.0
+                },
+                {
+                    "x": 1764.0,
+                    "y": 1084.0
+                },
+                {
+                    "x": 34.0,
+                    "y": 1086.0
                 }
             ],
             "src": [
@@ -119,16 +167,42 @@
             "quad": "0",
             "size": [
                 1920,
-                1080
+                1080,
+                1920,
+                685
             ],
             "texturePosition": [
                 0,
                 0
             ],
             "worldDimensions": {
-                "height": 2000,
-                "width": 3400,
+                "height": 2500,
+                "width": 7000,
                 "x": 0,
+                "y": 0
+            }
+        },
+        {
+            "id": "right",
+            "position": [
+                1921,
+                0
+            ],
+            "quad": "1",
+            "size": [
+                1920,
+                1080,
+                1644,
+                685
+            ],
+            "texturePosition": [
+                1920,
+                0
+            ],
+            "worldDimensions": {
+                "height": 2500,
+                "width": 6000,
+                "x": 7000,
                 "y": 0
             }
         }
