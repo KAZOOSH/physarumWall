@@ -9,6 +9,9 @@ void Physarum::setup(ofJson settings){
     simulationWidth = settings["textureDim"][0];
     simulationHeight = settings["textureDim"][1];
 
+    // number of particles
+    nParticles = simulationWidth*simulationHeight*6.15*settings["physarum"]["particleMultiplicator"].get<float>();
+
     hWall = 0;
     wWall = 0;
 
@@ -50,11 +53,11 @@ void Physarum::setup(ofJson settings){
     blurShader.setupShaderFromFile(GL_COMPUTE_SHADER,"shaders/computeshader_blur.glsl");
     blurShader.linkProgram();
 
-    particles.resize(settings["physarum"]["nParticles"].get<int>() * PARTICLE_PARAMETERS_COUNT);
+    particles.resize(nParticles * PARTICLE_PARAMETERS_COUNT);
     float marginx = 3;
     float marginy = 3;
 
-    for (int i = 0; i < settings["physarum"]["nParticles"].get<int>(); i++) {
+    for (int i = 0; i < nParticles; i++) {
         particles[PARTICLE_PARAMETERS_COUNT * i + 0] = floatAsUint16(ofRandom(marginx, simulationWidth - marginx) / simulationWidth);
         particles[PARTICLE_PARAMETERS_COUNT * i + 1] = floatAsUint16(ofRandom(marginy, simulationHeight - marginy) / simulationHeight);
         particles[PARTICLE_PARAMETERS_COUNT * i + 2] = floatAsUint16(ofRandom(1));
@@ -98,6 +101,10 @@ void Physarum::setup(ofJson settings){
 
     minTScenarioChange = settings["physarum"]["tminChangeScenario"].get<int>()*1000;
     maxTScenarioChange = settings["physarum"]["tmaxCangeScenario"].get<int>()*1000;
+    minActionSize = settings["physarum"]["action"]["size"][0].get<float>();
+    maxActionSize = settings["physarum"]["action"]["size"][1].get<float>();
+
+
 }
 
 void Physarum::paramsUpdate()
@@ -217,8 +224,6 @@ void Physarum::update(){
 
     fbo.begin();
     ofPushMatrix();
-    ofScale(1.5);
-    //ofScale(1.0*ofGetWidth()/fboDisplay.getWidth(),1.0*ofGetHeight()/fboDisplay.getHeight());
     fboDisplay.draw(0,0);
     ofPopMatrix();
     fbo.end();
@@ -227,139 +232,7 @@ void Physarum::update(){
 // DRAW
 
 void Physarum::draw(){
-    u = float(ofGetHeight())/1080;
 
-    float R2action = ofMap(curR2,-1,0.3,0,1,true);
-    if(numberOfGamepads==0) R2action = 0;
-
-    ofPushMatrix();
-
-    ofPushMatrix();
-    ofScale(1.0*ofGetWidth()/fboDisplay.getWidth(),1.0*ofGetHeight()/fboDisplay.getHeight());
-    fboDisplay.draw(0,0);
-    ofPopMatrix();
-
- /*   // draw circle
-    if(displayType==1)
-    {
-        ofPushMatrix();
-        
-        float time2 = getTime()*6;
-
-        float R = currentActionAreaSizeSigma*600*(1.0 + 0.08*sin(0.4f*time2));
-
-        float cx = ofMap(curActionX,0,simulationWidth,0,ofGetWidth());
-        float cy = ofMap(curActionY,0,simulationHeight,0,ofGetHeight());
-
-        ofSetCircleResolution(100);
-
-        drawCustomCircle(ofVec2f(cx,cy),R,9);
-        
-        ofPopMatrix();
-    }*/
-
-    ofFill();
-
-    ofPushMatrix();
-
-    float col = 0;
-
-    for(int setIndex=0;setIndex<NUMBER_OF_USED_POINTS;setIndex++)
-    {
-        ofPushMatrix();
-
-        ofPushMatrix();
-        ofTranslate(53*u,65*u);
-        ofScale(1.3);
-        drawPad(100,255);
-        ofScale(0.92);
-        drawPad(255,255);
-        ofPopMatrix();
-
-        ofTranslate(116*u,50*u + 50*setIndex*u);
-        std::string prefix = setIndex==0 ? "pen: " : "background: ";
-        std::string setString = prefix + pointsDataManager.getPointName(setIndex)
-        + (setIndex==pointsDataManager.getSelectionIndex() ? " <" : "");
-
-        ofTrueTypeFont * pBoldOrNotFont = setIndex==pointsDataManager.getSelectionIndex() ? &myFontBold : &myFont;
-        drawTextBox(setString, pBoldOrNotFont, col, 255);
-
-        ofPopMatrix();
-    }
-
-    if(settingsChangeMode == 1)
-    {
-        ofPushMatrix();
-        ofTranslate(50*u,180*u);
-
-        std::string pointName = pointsDataManager.getPointName(pointsDataManager.getSelectionIndex()) + " settings tuning:";
-        drawTextBox(pointName, &myFont, col, 255);
-
-
-        ofScale(0.8);
-
-        ofTranslate(0,25*u);
-
-        for(int i=0;i<SETTINGS_SIZE;i++)
-        {
-            ofTranslate(0,44*u);
-
-            ofTrueTypeFont * pBoldOrNotFont = i==settingsChangeIndex ? &myFontBold : &myFont;
-
-            std::string settingValueString = pointsDataManager.getSettingName(i) + " : "
-                + roundedString(pointsDataManager.getValue(i))
-                + (i==settingsChangeIndex ? " <" : "");;
-
-            drawTextBox(settingValueString, pBoldOrNotFont, col, 110);
-        }
-
-
-        ofTranslate(0,80*u);
-        std::string pressA = "Press A to reset " + pointsDataManager.getPointName(pointsDataManager.getSelectionIndex()) + " settings";
-        drawTextBox(pressA, &myFontBold, col, 110);
-
-
-        ofTranslate(0,44*u);
-        std::string pressB = "Press B to reset settings of all points";
-        drawTextBox(pressB, &myFontBold, col, 110);
-
-        ofPopMatrix();
-    }
-
-    ofPushMatrix();
-    ofTranslate(u*9,ofGetHeight() - 9*u);
-    ofScale(0.7);
-    std::string creditString = "Inspiration and parameters from mxsage's \"36 points\"";
-
-    ofPushMatrix();
-    ofSetColor(col,150);
-    ofTranslate(-10*u,-32*u);
-    ofDrawRectangle(0,0,20*u + myFont.stringWidth(creditString),41*u);
-    ofPopMatrix();
-
-    ofSetColor(255-col);
-    ofPushMatrix();
-    myFont.drawString(creditString,0,0);
-    ofPopMatrix();
-
-    ofPopMatrix();
-
-    ofPopMatrix();
-
-
-/*
-    // Saving frames
-    if(ofGetFrameNum()<numFrames){
-        std::ostringstream str;
-        int num = ofGetFrameNum();
-        std::cout << "Saving frame " << num << "\n" << std::flush;
-        str << std::setw(4) << std::setfill('0') << num;
-        ofSaveScreen("frames/fr"+str.str()+".png");
-    }
-*/
-
-
-    ofPopMatrix();
 }
 
 
@@ -367,7 +240,7 @@ void Physarum::draw(){
 
 void Physarum::updateActionAreaSizeSigma()
 {
-    float target = ofMap(sigmaCount,0,sigmaCountModulo,0.15,maxActionSize);
+    float target = ofMap(sigmaCount,0,sigmaCountModulo,minActionSize,maxActionSize,true);
     float lerper = pow(ofMap(getTime() - latestSigmaChangeTime, 0, ACTION_SIGMA_CHANGE_DURATION, 0, 1, true),1.7);
     currentActionAreaSizeSigma = ofLerp(currentActionAreaSizeSigma, target, lerper);
 }
@@ -446,8 +319,8 @@ void Physarum::updateInputs(ofTouchEventArgs& t)
 }
 
 void Physarum::remapTouchPosition(ofTouchEventArgs& t){
-    t.x = ofMap(t.x, 0, wWall, 0, simulationWidth*0.666, true);
-    t.y = ofMap(t.y, 0, hWall, 0, simulationHeight*0.666, true);
+    t.x = ofMap(t.x, 0, wWall, 0, simulationWidth, true);
+    t.y = ofMap(t.y, 0, hWall, 0, simulationHeight, true);
 }
 
 
@@ -502,7 +375,6 @@ void Physarum::onOscMessage(ofxOscMessage m)
 		if(m.getAddress() == "/physarum/nextParam"){
             sendChangeScenario();
             actionChangeParams(1);
-           // PointsDataManager.currentSelectionIndex
 		}
         else if(m.getAddress() == "/physarum/lastParam"){
             actionChangeParams(-1);
@@ -580,20 +452,21 @@ void Physarum::sendChangeScenario()
             m2.setAddress("/midi/cc");
             m2.addIntArg(0);
             m2.addIntArg(pointsDataManager.selectedIndices[pointsDataManager.getSelectionIndex()]);
-            m2.addIntArg(0);
+            m2.addIntArg(1);
             ofNotifyEvent(newOscMessageEvent,m2,this);
 
             ofxOscMessage m3;
             m3.setAddress("/midi/cc");
             m3.addIntArg(0);
             m3.addIntArg(pointsDataManager.selectedIndices[pointsDataManager.getSelectionIndex()]);
-            m3.addIntArg(1);
+            m3.addIntArg(2);
             ofNotifyEvent(newOscMessageEvent,m3,this);
 
             ofxOscMessage m4;
             m4.setAddress("/midi/cc");
             m4.addIntArg(0);
             m4.addIntArg(pointsDataManager.selectedIndices[pointsDataManager.getSelectionIndex()]);
-            m4.addIntArg(2);
+            m4.addIntArg(3);
             ofNotifyEvent(newOscMessageEvent,m4,this);
+        
 }

@@ -25,3 +25,15 @@ void TextureCreation::registerInputs(shared_ptr<GenericInput> input)
     ofAddListener(input->interactionMove,this,&TextureCreation::onTouchMove);
     ofAddListener(input->interactionEnd,this,&TextureCreation::onTouchUp);
 }
+
+void TextureCreation::saveTextureToFile(string filename)
+{
+    // Create an ofPixels to read the data into
+    ofPixels pixels;
+
+    // Allocate pixels with the same size and format
+    pixels.allocate(fbo.getWidth(), fbo.getHeight(), OF_IMAGE_COLOR);
+    fbo.readToPixels(pixels); 
+
+    ofSaveImage(pixels, filename);
+}

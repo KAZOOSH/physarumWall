@@ -21,8 +21,8 @@ void LidarController::setup(ofJson settings)
                                                 screen["worldDimensions"]["height"].get<int>());
         screenMaps.back().screenDim = ofRectangle(screen["texturePosition"][0].get<int>(),
                                                   screen["texturePosition"][1].get<int>(),
-                                                  screen["size"][0].get<int>(),
-                                                  screen["size"][1].get<int>());
+                                                  screen["textureSize"][0].get<int>(),
+                                                  screen["textureSize"][1].get<int>());
     }
     for (auto &lidar : settings["lidars"])
     {

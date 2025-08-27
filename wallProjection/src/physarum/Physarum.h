@@ -76,7 +76,8 @@ public:
     float actionAreaSizeSigma = 0.3;
     int sigmaCount = 2;
     int sigmaCountModulo = 6;
-    float maxActionSize = 0.85;
+    float minActionSize = 0.1;
+    float maxActionSize = 0.1;
     float currentActionAreaSizeSigma = 0.5;
     float latestSigmaChangeTime = -12345;
     void updateActionAreaSizeSigma();
@@ -111,6 +112,7 @@ public:
     std::array<float, MAX_NUMBER_OF_RANDOM_SPAWN> randomSpawnYarray = {};
     int randomSpawnNumber = 0;
     void setRandomSpawn();
+    unsigned int nParticles;
 
     ofFbo trailReadBuffer,trailWriteBuffer,fboDisplay;
     ofShader setterShader,moveShader,depositShader,blurShader;

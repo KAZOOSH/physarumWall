@@ -1,4 +1,5 @@
 #include "ofApp.h"
+#include "TextureCreation.h"
 
 //--------------------------------------------------------------
 void ofApp::setup(){
@@ -30,14 +31,13 @@ void ofApp::setup(){
         ++i;
     }   
 
-    //receiver.setup(settings["network"]["port"]); 
 
     // calculate texture size
     int texW = 0;
     int texH = 0;
     for (auto& screen : settings["screens"]){
-        int texWt = screen["size"][0].get<int>() + screen["texturePosition"][0].get<int>(); 
-        int texHt = screen["size"][1].get<int>() + screen["texturePosition"][1].get<int>();
+        int texWt = screen["textureSize"][0].get<int>() + screen["texturePosition"][0].get<int>(); 
+        int texHt = screen["textureSize"][1].get<int>() + screen["texturePosition"][1].get<int>();
         if(texWt > texW){
             texW = texWt;
         } 
@@ -105,7 +105,19 @@ void ofApp::draw(){
        // panel.draw();
         ofPopStyle();
     }
+
+    if (isCaptureTexture){
+        string filename = "capture/";
+        if(nImagesCaptured <10) filename+="0";
+        if(nImagesCaptured <100) filename+="0";
+        if(nImagesCaptured <1000) filename+="0";
+        filename += (ofToString(nImagesCaptured));
+        filename +=".png";
+        textureCreation->saveTextureToFile(filename);
+        nImagesCaptured++;
+    }
 }
+
 
 void ofApp::drawWindow2(ofEventArgs &args)
 {
@@ -178,7 +190,7 @@ void ofApp::drawScreen(int screenId)
     //ofEnableBlendMode(OF_BLENDMODE_MULTIPLY);
     textureCreation->getTexture().drawSubsection(
         ofRectangle(0, 0, settingsScreen["size"][0].get<int>(), settingsScreen["size"][1].get<int>()),
-        ofRectangle(settingsScreen["texturePosition"][0], settingsScreen["texturePosition"][1], settingsScreen["size"][0].get<int>(), settingsScreen["size"][1].get<int>()));
+        ofRectangle(settingsScreen["texturePosition"][0], settingsScreen["texturePosition"][1], settingsScreen["textureSize"][0].get<int>(), settingsScreen["textureSize"][1].get<int>()));
     //ofEnableBlendMode(OF_BLENDMODE_MULTIPLY);
     //ofSetColor(255,blendIntensity*255);
     if(isDebug){
@@ -186,7 +198,7 @@ void ofApp::drawScreen(int screenId)
         controller->updateTexture();
         controller->getDebugTexture().drawSubsection(
             ofRectangle(0, 0, settingsScreen["size"][0].get<int>(), settingsScreen["size"][1].get<int>()),
-            ofRectangle(settingsScreen["texturePosition"][0], settingsScreen["texturePosition"][1], settingsScreen["size"][0].get<int>(), settingsScreen["size"][1].get<int>()));
+            ofRectangle(settingsScreen["texturePosition"][0], settingsScreen["texturePosition"][1], settingsScreen["textureSize"][0].get<int>(), settingsScreen["textureSize"][1].get<int>()));
     }
     
     ofEnableAlphaBlending();
@@ -278,6 +290,10 @@ void ofApp::processKeyPressedEvent(int key, int screenId)
     }
     if (key == 'q') {
         ofSetWindowPosition(0,0);
+    }
+
+    if(key == 'l'){
+        isCaptureTexture = !isCaptureTexture;
     }
 }
 

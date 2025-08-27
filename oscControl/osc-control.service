@@ -1,0 +1,14 @@
+[Unit]
+Description=OSC Control Node App
+After=network.target
+
+[Service]
+Type=simple
+User=brian
+WorkingDirectory=/var/www/oscControl
+ExecStart=/var/www/oscControl/start.sh
+Restart=always
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target

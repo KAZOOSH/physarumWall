@@ -55,10 +55,12 @@ public:
     float blendIntensity = 1.0;
     float tx = 1.0;
 
+    bool isCaptureTexture = false;
+    int nImagesCaptured = 0;
+
   shared_ptr<Physarum> textureCreation;
 
   shared_ptr<LidarController> controller;
   shared_ptr<MouseInput> mouseInput;
- // ofxOscReceiver receiver;
 };
 

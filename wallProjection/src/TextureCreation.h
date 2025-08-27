@@ -30,6 +30,8 @@ public:
     virtual void onOscMessage(ofxOscMessage m){};
     ofEvent<ofxOscMessage> newOscMessageEvent;
 
+    void saveTextureToFile(string filename);
+
 protected:
     ofFbo fbo;
     
