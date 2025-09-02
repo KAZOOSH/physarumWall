@@ -40,18 +40,18 @@
     "network": {
         "messages": {
             "x": {
-                "left": {
-                    "channel": 1,
-                    "note": [
-                        36,
-                        60
-                    ]
-                },
                 "center": {
                     "channel": 0,
                     "note": [
                         48,
                         72
+                    ]
+                },
+                "left": {
+                    "channel": 1,
+                    "note": [
+                        36,
+                        60
                     ]
                 },
                 "right": {
@@ -75,13 +75,15 @@
         "oscPortOut": 8000
     },
     "physarum": {
-        "particleMultiplicator":1.0,
+        "action": {
+            "size": [
+                0.01,
+                0.1
+            ]
+        },
+        "particleMultiplicator": 1.0,
         "tmaxCangeScenario": 80,
-        "tminChangeScenario": 20,
-        "action":{
-            "size":[0.01,0.1]
-
-        }
+        "tminChangeScenario": 20
     },
     "quadwarp": {
         "0": {

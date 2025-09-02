@@ -217,7 +217,6 @@ void Physarum::update(){
     //ofSetWindowTitle(strm.str());
 
 
-    
     if(ofGetElapsedTimeMillis() > nextChangeScenario){
         changeScenario();
     }
@@ -415,6 +414,9 @@ void Physarum::onOscMessage(ofxOscMessage m)
         else if(m.getAddress() == "/physarum/setMaxTimeScenarioChange"){
             maxTScenarioChange = m.getArgAsInt(0)*1000;
             //cout << maxTScenarioChange <<endl;
+		}else if(m.getAddress() == "/physarum/changeValue"){
+            int index = m.getArgAsInt32(0);
+            int value = m.getArgAsInt32(1);
 		}
 }
 
@@ -452,21 +454,21 @@ void Physarum::sendChangeScenario()
             m2.setAddress("/midi/cc");
             m2.addIntArg(0);
             m2.addIntArg(pointsDataManager.selectedIndices[pointsDataManager.getSelectionIndex()]);
-            m2.addIntArg(1);
+            m2.addIntArg(0);
             ofNotifyEvent(newOscMessageEvent,m2,this);
 
             ofxOscMessage m3;
             m3.setAddress("/midi/cc");
             m3.addIntArg(0);
             m3.addIntArg(pointsDataManager.selectedIndices[pointsDataManager.getSelectionIndex()]);
-            m3.addIntArg(2);
+            m3.addIntArg(1);
             ofNotifyEvent(newOscMessageEvent,m3,this);
 
             ofxOscMessage m4;
             m4.setAddress("/midi/cc");
             m4.addIntArg(0);
             m4.addIntArg(pointsDataManager.selectedIndices[pointsDataManager.getSelectionIndex()]);
-            m4.addIntArg(3);
+            m4.addIntArg(2);
             ofNotifyEvent(newOscMessageEvent,m4,this);
         
 }

@@ -24,6 +24,8 @@ public:
 
 private:
     int currentId = 0;
+    glm::vec2 dimensions;
+    glm::vec2 screen;
 };
 
 #endif
