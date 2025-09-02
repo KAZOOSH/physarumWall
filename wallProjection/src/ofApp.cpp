@@ -64,8 +64,11 @@ void ofApp::setup(){
 
 
     receiver.setup(settings["network"]["oscPortIn"].get<int>());
-    sender.setup(settings["network"]["oscIpOut"].get<std::string>().c_str(),settings["network"]["oscPortOut"].get<int>());
-    
+    for (auto& s:settings["network"]["oscOut"])
+    {
+        sender.push_back(ofxOscSender());
+        sender.back().setup(s["ip"].get<std::string>().c_str(),s["port"].get<int>());
+    }
 
     ofAddListener(textureCreation->newOscMessageEvent,this,&ofApp::onOscSendEvent);
     ofAddListener(controller->newOscMessageEvent,this,&ofApp::onOscSendEvent);
@@ -163,7 +166,15 @@ void ofApp::exit()
 void ofApp::onOscSendEvent(ofxOscMessage &m)
 {
     // maybe as threaded sender
-    sender.sendMessage(m, false);
+    for (size_t i=0;i<sender.size();++i)
+    {
+        if(ofIsStringInString(m.getAddress(),settings["network"]["oscOut"][i]["channel"].get<string>()) ){
+            sender[i].sendMessage(m, false);
+        }
+        
+    }
+    
+    
 }
 
 

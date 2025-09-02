@@ -70,9 +70,11 @@
                 ]
             }
         },
-        "oscIpOut": "192.168.1.243",
         "oscPortIn": 8888,
-        "oscPortOut": 8000
+        "oscOut":[
+            {"ip": "192.168.1.243","port": 8000,"channel":"midi"},
+            {"ip": "127.0.0.1","port": 3333,"channel":"valueUpdate"}
+        ]
     },
     "physarum": {
         "action": {

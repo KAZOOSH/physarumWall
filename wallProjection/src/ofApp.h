@@ -44,7 +44,7 @@ public:
     void processKeyPressedEvent(int key, int screenId);
 
     ofxOscReceiver receiver;
-    ofxOscSender sender;
+    vector<ofxOscSender> sender;
     
     
     vector<ofxQuadWarp> warper;

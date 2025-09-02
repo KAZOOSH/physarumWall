@@ -4,14 +4,15 @@
     "description": "A simple web application to send OSC messages for controlling Physarum",
     "main": "app.js",
     "scripts": {
-      "start": "node app.js",
-      "dev": "nodemon app.js"
+        "start": "node app.js",
+        "dev": "nodemon app.js"
     },
     "dependencies": {
-      "express": "^4.18.2",
-      "node-osc": "^8.0.11"
+        "express": "^4.18.2",
+        "node-osc": "^8.0.11",
+        "ws": "^8.18.3"
     },
     "devDependencies": {
-      "nodemon": "^3.0.1"
+        "nodemon": "^3.0.1"
     }
-  }
+}

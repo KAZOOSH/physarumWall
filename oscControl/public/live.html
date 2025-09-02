@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Physarum Live Parameter Control</title>
+  <link rel="stylesheet" href="live-styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Physarum Live Parameter Control</h1>
+    
+    <div class="connection-status" id="connectionStatus">
+      <span class="status-indicator" id="statusIndicator"></span>
+      <span id="statusText">Connecting...</span>
+    </div>
+
+    <div class="parameters-grid">
+      <!-- SD Parameters -->
+      <div class="parameter-section">
+        <h3>Sensor Distance (SD)</h3>
+        <div class="slider-group">
+          <label for="SD0">SD0 (Base)</label>
+          <input type="range" id="SD0" class="param-slider" min="0" max="27.5" step="0.001" value="0" data-address="/physarum/SD0">
+          <span class="value-display" id="SD0-value">0</span>
+        </div>
+        <div class="slider-group">
+          <label for="SDE">SDE (Exponent)</label>
+          <input type="range" id="SDE" class="param-slider" min="0.8" max="32.88" step="0.01" value="4" data-address="/physarum/SDE">
+          <span class="value-display" id="SDE-value">4</span>
+        </div>
+        <div class="slider-group">
+          <label for="SDA">SDA (Amplitude)</label>
+          <input type="range" id="SDA" class="param-slider" min="0" max="402" step="0.01" value="0.3" data-address="/physarum/SDA">
+          <span class="value-display" id="SDA-value">0.3</span>
+        </div>
+      </div>
+
+      <!-- SA Parameters -->
+      <div class="parameter-section">
+        <h3>Step Angle (SA)</h3>
+        <div class="slider-group">
+          <label for="SA0">SA0 (Base)</label>
+          <input type="range" id="SA0" class="param-slider" min="0" max="5.2" step="0.001" value="0.1" data-address="/physarum/SA0">
+          <span class="value-display" id="SA0-value">0.1</span>
+        </div>
+        <div class="slider-group">
+          <label for="SAE">SAE (Exponent)</label>
+          <input type="range" id="SAE" class="param-slider" min="0" max="51.32" step="0.01" value="1" data-address="/physarum/SAE">
+          <span class="value-display" id="SAE-value">1</span>
+        </div>
+        <div class="slider-group">
+          <label for="SAA">SAA (Amplitude)</label>
+          <input type="range" id="SAA" class="param-slider" min="0" max="20" step="0.01" value="0" data-address="/physarum/SAA">
+          <span class="value-display" id="SAA-value">0</span>
+        </div>
+      </div>
+
+      <!-- RA Parameters -->
+      <div class="parameter-section">
+        <h3>Rotation Angle (RA)</h3>
+        <div class="slider-group">
+          <label for="RA0">RA0 (Base)</label>
+          <input type="range" id="RA0" class="param-slider" min="0" max="3.35" step="0.001" value="0.41" data-address="/physarum/RA0">
+          <span class="value-display" id="RA0-value">0.41</span>
+        </div>
+        <div class="slider-group">
+          <label for="RAE">RAE (Exponent)</label>
+          <input type="range" id="RAE" class="param-slider" min="0" max="20" step="0.01" value="1" data-address="/physarum/RAE">
+          <span class="value-display" id="RAE-value">1</span>
+        </div>
+        <div class="slider-group">
+          <label for="RAA">RAA (Amplitude)</label>
+          <input type="range" id="RAA" class="param-slider" min="0" max="12.62" step="0.01" value="0" data-address="/physarum/RAA">
+          <span class="value-display" id="RAA-value">0</span>
+        </div>
+      </div>
+
+      <!-- MD Parameters -->
+      <div class="parameter-section">
+        <h3>Move Distance (MD)</h3>
+        <div class="slider-group">
+          <label for="MD0">MD0 (Base)</label>
+          <input type="range" id="MD0" class="param-slider" min="0" max="0.83" step="0.001" value="0.1" data-address="/physarum/MD0">
+          <span class="value-display" id="MD0-value">0.1</span>
+        </div>
+        <div class="slider-group">
+          <label for="MDE">MDE (Exponent)</label>
+          <input type="range" id="MDE" class="param-slider" min="1.2" max="32.88" step="0.01" value="3" data-address="/physarum/MDE">
+          <span class="value-display" id="MDE-value">3</span>
+        </div>
+        <div class="slider-group">
+          <label for="MDA">MDA (Amplitude)</label>
+          <input type="range" id="MDA" class="param-slider" min="0" max="37.74" step="0.01" value="0.1" data-address="/physarum/MDA">
+          <span class="value-display" id="MDA-value">0.1</span>
+        </div>
+      </div>
+
+      <!-- SB Parameters -->
+      <div class="parameter-section">
+        <h3>Substrate Blend (SB)</h3>
+        <div class="slider-group">
+          <label for="SB1">SB1</label>
+          <input type="range" id="SB1" class="param-slider" min="0" max="2.54" step="0.001" value="0" data-address="/physarum/SB1">
+          <span class="value-display" id="SB1-value">0</span>
+        </div>
+        <div class="slider-group">
+          <label for="SB2">SB2</label>
+          <input type="range" id="SB2" class="param-slider" min="0" max="14.25" step="0.01" value="0" data-address="/physarum/SB2">
+          <span class="value-display" id="SB2-value">0</span>
+        </div>
+      </div>
+
+      <!-- SF Parameter -->
+      <div class="parameter-section">
+        <h3>Scale Factor (SF)</h3>
+        <div class="slider-group">
+          <label for="SF">SF</label>
+          <input type="range" id="SF" class="param-slider" min="8" max="39" step="0.1" value="22" data-address="/physarum/SF">
+          <span class="value-display" id="SF-value">22</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="status" class="status">Ready</div>
+  </div>
+
+  <script>
+    let ws;
+    let isUpdatingFromOSC = false;
+
+    // Initialize WebSocket connection
+    function initWebSocket() {
+      ws = new WebSocket('ws://localhost:8080');
+      
+      ws.onopen = function() {
+        document.getElementById('statusIndicator').className = 'status-indicator connected';
+        document.getElementById('statusText').textContent = 'Connected';
+        console.log('WebSocket connected');
+      };
+      
+      ws.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        
+        if (data.type === 'parameterUpdate') {
+          isUpdatingFromOSC = true;
+          
+          if (data.values) {
+            // Bulk update on initial connection
+            Object.keys(data.values).forEach(paramName => {
+              updateSliderValue(paramName, data.values[paramName]);
+            });
+          } else if (data.paramName && data.value !== undefined) {
+            // Single parameter update
+            updateSliderValue(data.paramName, data.value);
+          }
+          
+          setTimeout(() => {
+            isUpdatingFromOSC = false;
+          }, 50);
+        }
+      };
+      
+      ws.onclose = function() {
+        document.getElementById('statusIndicator').className = 'status-indicator disconnected';
+        document.getElementById('statusText').textContent = 'Disconnected - Retrying...';
+        console.log('WebSocket disconnected, retrying in 3 seconds...');
+        setTimeout(initWebSocket, 3000);
+      };
+      
+      ws.onerror = function(error) {
+        console.error('WebSocket error:', error);
+        document.getElementById('statusIndicator').className = 'status-indicator error';
+        document.getElementById('statusText').textContent = 'Connection Error';
+      };
+    }
+
+    function updateSliderValue(paramName, value) {
+      const slider = document.getElementById(paramName);
+      const valueDisplay = document.getElementById(paramName + '-value');
+      
+      if (slider && valueDisplay) {
+        slider.value = value;
+        valueDisplay.textContent = parseFloat(value).toFixed(3);
+      }
+    }
+
+    // Initialize sliders and event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+      const sliders = document.querySelectorAll('.param-slider');
+      const statusElement = document.getElementById('status');
+      
+      // Initialize WebSocket
+      initWebSocket();
+      
+      sliders.forEach(slider => {
+        const valueDisplay = document.getElementById(slider.id + '-value');
+        
+        // Initialize display
+        valueDisplay.textContent = parseFloat(slider.value).toFixed(3);
+        
+        slider.addEventListener('input', async function() {
+          // Don't send OSC if this update came from OSC
+          if (isUpdatingFromOSC) return;
+          
+          const address = slider.getAttribute('data-address');
+          const value = parseFloat(slider.value);
+          
+          // Update display
+          valueDisplay.textContent = value.toFixed(3);
+          
+          // Send OSC message
+          try {
+            statusElement.textContent = `Sending: ${address.split('/').pop()} = ${value.toFixed(3)}`;
+            statusElement.className = 'status';
+            
+            const response = await fetch('/send-osc-with-args', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ 
+                address,
+                args: [value] 
+              }),
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+              statusElement.textContent = `Sent: ${address.split('/').pop()} = ${value.toFixed(3)}`;
+              statusElement.className = 'status success';
+            } else {
+              throw new Error(data.error || 'Failed to send OSC message');
+            }
+          } catch (error) {
+            console.error('Error sending OSC message:', error);
+            statusElement.textContent = `Error: ${error.message}`;
+            statusElement.className = 'status error';
+          } finally {
+            setTimeout(() => {
+              statusElement.textContent = 'Ready';
+              statusElement.className = 'status';
+            }, 2000);
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

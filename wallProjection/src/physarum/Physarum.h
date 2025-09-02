@@ -31,7 +31,6 @@
 #define MAX_NUMBER_OF_RANDOM_SPAWN 5
 #define MAX_NUMBER_OF_INPUTS 150
 
-
 class Physarum : public TextureCreation{
 
 public:
@@ -150,6 +149,12 @@ public:
 
     int wWall;
     int hWall;
+
+
+    vector<std::string> parameterNames;
+
+    
+
 
 
 

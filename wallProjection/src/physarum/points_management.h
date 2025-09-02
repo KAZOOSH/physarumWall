@@ -225,6 +225,21 @@ struct PointsDataManager
     return point[matrixColumnIndex];
   }
 
+  void changeValue(int settingIndex,float value)
+  {
+    int matrixColumnIndex = (settingIndex==0 ? PARAMS_DIMENSION-1 : settingIndex-1);
+    int lineIndex = selectedPoints[selectedIndices[currentSelectionIndex]];
+    PointData& point = currentPointsData[lineIndex];
+
+    point[matrixColumnIndex] = value;
+    point[matrixColumnIndex] = std::max(0.f,point[matrixColumnIndex]);
+
+    for(int i=0;i<NUMBER_OF_USED_POINTS;i++)
+    {
+      if(lineIndex == selectedPoints[selectedIndices[i]]) usedPointsTargets[i] = point;
+    }
+  }
+/*
   void changeValue(int settingIndex,int dir)
   {
     int matrixColumnIndex = (settingIndex==0 ? PARAMS_DIMENSION-1 : settingIndex-1);
@@ -245,7 +260,7 @@ struct PointsDataManager
     {
       if(lineIndex == selectedPoints[selectedIndices[i]]) usedPointsTargets[i] = point;
     }
-  }
+  }*/
 
   void createRandomParameters()
   {
