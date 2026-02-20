@@ -344,7 +344,7 @@ void Physarum::onTouchDown(ofTouchEventArgs &ev)
     // coudt << ev.x << " : " << ev.y;
 
     remapTouchPosition(ev);
-    tuple<long, ofTouchEventArgs> t{ofGetElapsedTimeMillis(), ev};
+    std::tuple<long,ofTouchEventArgs> t {ofGetElapsedTimeMillis(),ev};
     touches[ev.id] = t;
 
     // cout << "   ->   " << ev.x << " : " << ev.y <<endl;
@@ -374,7 +374,7 @@ void Physarum::onTouchMove(ofTouchEventArgs &ev)
 {
     // cout << ev.x << " , " <<ev.y <<endl;
     remapTouchPosition(ev);
-    tuple<long, ofTouchEventArgs> t{ofGetElapsedTimeMillis(), ev};
+    std::tuple<long,ofTouchEventArgs> t {ofGetElapsedTimeMillis(),ev};
     touches[ev.id] = t;
 
     updateInputs(ev);
@@ -455,7 +455,7 @@ void Physarum::changeScenario()
         pointsDataManager.currentSelectionIndex = 0;
         actionChangeParams(1);
         sendChangeScenario();
-       
+
     }
     // lastFG
     else if (nextAction < 8)
@@ -513,7 +513,7 @@ void Physarum::sendChangeScenario()
         m5.addIntArg(pointsDataManager.getValue(i));
         ofNotifyEvent(newOscEvent, m5, this);
     }
-    
+
     // sync messages for other installations
     ofxOscMessage s1;
     string mode = "background";
@@ -524,6 +524,6 @@ void Physarum::sendChangeScenario()
     s1.addIntArg(pointsDataManager.selectedIndices[pointsDataManager.currentSelectionIndex ]);
     ofNotifyEvent(newOscEvent, s1, this);
 
-   
-    
+
+
 }

@@ -134,7 +134,7 @@ public:
 
     ofTrueTypeFont myFont, myFontBold;
 
-    map<int,tuple<long, ofTouchEventArgs> > touches;
+    map<int,std::tuple<long, ofTouchEventArgs> > touches;
 
     int simulationWidth;
     int simulationHeight;

@@ -1,8 +1,5 @@
-ofxNetwork
+ofxGui
 ofxNetwork
 ofxOpenCv
-ofxOpenCv
 ofxOsc
-ofxOsc
-ofxQuadWarp
 ofxQuadWarp
