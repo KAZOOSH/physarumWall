@@ -156,7 +156,7 @@ void LidarController::registerInputs(shared_ptr<GenericInput> input)
 void LidarController::onTouchMove(ofTouchEventArgs &ev)
 {
     touches[ev.id] = ev;
-     cout << "move " << ev.x << "  " << ev.y << endl;
+    // cout << "move " << ev.x << "  " << ev.y << endl;
     mapTouchToTexCoords(ev);
     interactionMove.notify(ev);
     // updateTexture();
@@ -426,14 +426,14 @@ void LidarController::onTouchUp(ofTouchEventArgs &ev)
     touches.erase(ev.id);
     mapTouchToTexCoords(ev);
     interactionEnd.notify(ev);
-     cout << "up " << ev.x << "  " << ev.y << endl;
+    // cout << "up " << ev.x << "  " << ev.y << endl;
     // updateTexture();
 }
 
 void LidarController::onTouchDown(ofTouchEventArgs &ev)
 {
     touches[ev.id] = ev;
-     cout << "down ->" << ev.id << " : "<<ev.x << "  " << ev.y << endl;
+    // cout << "down ->" << ev.id << " : "<<ev.x << "  " << ev.y << endl;
     mapTouchToTexCoords(ev);
     interactionStart.notify(ev);
     // updateTexture();

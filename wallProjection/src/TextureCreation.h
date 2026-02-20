@@ -28,7 +28,8 @@ public:
     virtual void onTouchMove(ofTouchEventArgs& ev){};
 
     virtual void onOscMessage(ofxOscMessage m){};
-    ofEvent<ofxOscMessage> newOscMessageEvent;
+    ofEvent<ofxOscMessage> newOscEvent;
+
 
     void saveTextureToFile(string filename);
 

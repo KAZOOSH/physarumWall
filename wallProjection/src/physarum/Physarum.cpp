@@ -24,7 +24,7 @@ void Physarum::setup(ofJson settings)
         }
         wWall += w["worldDimensions"]["width"].get<int>();
     }
-    cout << "wh " << wWall << "  " << hWall << endl;
+    //cout << "wh " << wWall << "  " << hWall << endl;
 
     ofSetFrameRate(FRAME_RATE);
 
@@ -455,6 +455,7 @@ void Physarum::changeScenario()
         pointsDataManager.currentSelectionIndex = 0;
         actionChangeParams(1);
         sendChangeScenario();
+       
     }
     // lastFG
     else if (nextAction < 8)
@@ -473,43 +474,56 @@ void Physarum::changeScenario()
 
 void Physarum::sendChangeScenario()
 {
+
+    // midi messages
     ofxOscMessage m;
     m.setAddress("/midi/cc");
     m.addIntArg(pointsDataManager.selectedIndices[pointsDataManager.getSelectionIndex()] + 1);
     m.addIntArg(127);
     m.addIntArg(3);
-    ofNotifyEvent(newOscMessageEvent, m, this);
+    ofNotifyEvent(newOscEvent, m, this);
 
     ofxOscMessage m2;
     m2.setAddress("/midi/cc");
     m2.addIntArg(0);
     m2.addIntArg(pointsDataManager.selectedIndices[pointsDataManager.getSelectionIndex()]);
     m2.addIntArg(0);
-    ofNotifyEvent(newOscMessageEvent, m2, this);
+    ofNotifyEvent(newOscEvent, m2, this);
 
     ofxOscMessage m3;
     m3.setAddress("/midi/cc");
     m3.addIntArg(0);
     m3.addIntArg(pointsDataManager.selectedIndices[pointsDataManager.getSelectionIndex()]);
     m3.addIntArg(1);
-    ofNotifyEvent(newOscMessageEvent, m3, this);
+    ofNotifyEvent(newOscEvent, m3, this);
 
     ofxOscMessage m4;
     m4.setAddress("/midi/cc");
     m4.addIntArg(0);
     m4.addIntArg(pointsDataManager.selectedIndices[pointsDataManager.getSelectionIndex()]);
     m4.addIntArg(2);
-    ofNotifyEvent(newOscMessageEvent, m4, this);
+    ofNotifyEvent(newOscEvent, m4, this);
 
+    // webcontrol message
     for (size_t i = 0; i < parameterNames.size(); i++)
     {
         ofxOscMessage m5;
         m5.setAddress("/valueUpdate");
         m5.addStringArg(parameterNames[i]);
         m5.addIntArg(pointsDataManager.getValue(i));
-        ofNotifyEvent(newOscMessageEvent, m5, this);
+        ofNotifyEvent(newOscEvent, m5, this);
     }
     
+    // sync messages for other installations
+    ofxOscMessage s1;
+    string mode = "background";
+    if(pointsDataManager.currentSelectionIndex == 1){
+        mode = "foreground";
+    }
+    s1.setAddress("/sync/" + mode);
+    s1.addIntArg(pointsDataManager.selectedIndices[pointsDataManager.currentSelectionIndex ]);
+    ofNotifyEvent(newOscEvent, s1, this);
+
    
     
 }

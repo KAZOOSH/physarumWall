@@ -9,6 +9,7 @@
 #include "ofFbo.h"
 #include "ofxOsc.h"
 
+#define MAX_HEIGHT 2200 // max interaction height of screen 
 
 class GenericInput
 {
@@ -26,7 +27,7 @@ public:
 
     void onTouchOscTouch(ofTouchEventArgs& args);
 
-    ofEvent<ofxOscMessage> newOscMessageEvent;
+    ofEvent<ofxOscMessage> newOscEvent;
 protected:
    
 

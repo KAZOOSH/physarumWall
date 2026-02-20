@@ -4,7 +4,7 @@ sudo cp osc-control.service /etc/systemd/system/
 chmod +x start.sh
 
 cd ..
-sudo cp -r osc-control /var/www
+sudo cp -r oscControl /var/www
 
 # Reload systemd so it recognizes the new service
 sudo systemctl daemon-reload

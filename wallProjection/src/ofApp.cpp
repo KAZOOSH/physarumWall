@@ -70,9 +70,9 @@ void ofApp::setup(){
         sender.back().setup(s["ip"].get<std::string>().c_str(),s["port"].get<int>());
     }
 
-    ofAddListener(textureCreation->newOscMessageEvent,this,&ofApp::onOscSendEvent);
-    ofAddListener(controller->newOscMessageEvent,this,&ofApp::onOscSendEvent);
-    ofAddListener(mouseInput->newOscMessageEvent,this,&ofApp::onOscSendEvent);
+    ofAddListener(textureCreation->newOscEvent,this,&ofApp::onOscSendEvent);
+    ofAddListener(controller->newOscEvent,this,&ofApp::onOscSendEvent);
+    ofAddListener(mouseInput->newOscEvent,this,&ofApp::onOscSendEvent);
 
     //ofSetWindowPosition(-1920,0);
    // cout << ofg() <<endl;
@@ -170,6 +170,7 @@ void ofApp::onOscSendEvent(ofxOscMessage &m)
     {
         if(ofIsStringInString(m.getAddress(),settings["network"]["oscOut"][i]["channel"].get<string>()) ){
             sender[i].sendMessage(m, false);
+            
         }
         
     }

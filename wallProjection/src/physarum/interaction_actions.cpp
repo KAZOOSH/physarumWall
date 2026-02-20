@@ -12,6 +12,7 @@ void Physarum::actionChangeParams(int dir)
     pointsDataManager.changeParamIndex(dir);
 
     transitionTriggerTime = getTime();
+     
 }
 
 void Physarum::actionSwapParams()
@@ -31,6 +32,15 @@ void Physarum::actionRandomParams()
 void Physarum::actionChangeColorMode()
 {
     colorModeType = (colorModeType + 1) % NUMBER_OF_COLOR_MODES;
+    // sync messages for other installations
+    ofxOscMessage s1;
+    string mode = "background";
+    if(pointsDataManager.currentSelectionIndex == 1){
+        mode = "colormode";
+    }
+    s1.setAddress("/sync/" + mode);
+    s1.addIntArg(colorModeType);
+    ofNotifyEvent(newOscEvent, s1, this);
 }
 
 void Physarum::actionTriggerWave(int x, int y)
