@@ -1,5 +1,4 @@
 #include "ofApp.h"
-#include "TextureCreation.h"
 
 #ifdef __linux__
 #include <dirent.h>
@@ -52,7 +51,6 @@ void ofApp::setup(){
         }
     }
     settings["textureDim"]={texW,texH};
-
 
     textureCreation = shared_ptr<Physarum>(new Physarum());
     textureCreation->setup(settings);

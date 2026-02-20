@@ -44,7 +44,6 @@ public:
     void exit();
 
     void onOscSendEvent(ofxOscMessage& m);
-    void onMidiSyncEvent(ofxOscMessage& m);
 
     void drawScreen(int screenId);
     void processKeyPressedEvent(int key, int screenId);

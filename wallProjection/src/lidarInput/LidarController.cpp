@@ -102,7 +102,7 @@ void LidarController::update()
             t.xspeed = speed.x;
             t.yspeed = speed.y;
 
-            touchesNew.insert(make_pair(id, t));
+            touchesNew.insert(std::make_pair(id, t));
         }
         else
         {
@@ -110,7 +110,7 @@ void LidarController::update()
             currentId++;
 
             ofTouchEventArgs t = ofTouchEventArgs(ofTouchEventArgs::down, cluster.center.x, cluster.center.y, id);
-            touchesNew.insert(make_pair(id, t));
+            touchesNew.insert(std::make_pair(id, t));
         }
     }
     for (auto &e : touchLeave)
