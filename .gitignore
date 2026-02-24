@@ -30,4 +30,5 @@ example-ofxAutoReloadedShader/*
 example-ofxAutoReloadedShaderGeom/*
 gpuParticlesexample/*
 particle_life/*
+wallProjection/.zed/*
 

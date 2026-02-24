@@ -1,0 +1,64 @@
+CompileFlags:
+  Add:
+    - -std=c++17
+    - -xc++
+    # Project sources
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/apps/physarumWall/wallProjection/src
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/apps/physarumWall/wallProjection/src/physarum
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/apps/physarumWall/wallProjection/src/lidarInput
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/apps/physarumWall/wallProjection/src/mouseInput
+    # openFrameworks core
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/libs/openFrameworks
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/libs/openFrameworks/app
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/libs/openFrameworks/communication
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/libs/openFrameworks/events
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/libs/openFrameworks/gl
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/libs/openFrameworks/graphics
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/libs/openFrameworks/math
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/libs/openFrameworks/sound
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/libs/openFrameworks/types
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/libs/openFrameworks/utils
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/libs/openFrameworks/video
+    # openFrameworks libs
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/libs/cairo/include/cairo
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/libs/curl/include
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/libs/fmod/include
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/libs/FreeImage/include
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/libs/freetype/include
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/libs/glew/include
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/libs/glfw/include
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/libs/glm/include
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/libs/json/include
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/libs/pugixml/include
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/libs/rtAudio/include
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/libs/tess2/include
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/libs/uriparser/include
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/libs/utf8/include
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/libs/kiss/include
+    # Addons
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/addons/ofxGui/src
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/addons/ofxNetwork/src
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/addons/ofxOpenCv/libs
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/addons/ofxOpenCv/src
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/addons/ofxOsc/src
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/addons/ofxOsc/libs/oscpack
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/addons/ofxOsc/libs/oscpack/src
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/addons/ofxOsc/libs/oscpack/src/ip
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/addons/ofxOsc/libs/oscpack/src/ip/posix
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/addons/ofxOsc/libs/oscpack/src/osc
+    - -I/home/brian/Dev/of_v20260214_linux64_gcc6_release/addons/ofxQuadWarp/src
+    # System
+    - -I/usr/include
+    - -I/usr/local/include
+    - -I/usr/include/gstreamer-1.0
+    - -I/usr/include/glib-2.0
+    - -I/usr/lib/x86_64-linux-gnu/glib-2.0/include
+    - -I/usr/include/cairo
+    - -I/usr/include/pulse
+
+Diagnostics:
+  UnusedIncludes: None
+  MissingIncludes: None
+
+Index:
+  Background: Build
