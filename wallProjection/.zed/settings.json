@@ -1,0 +1,28 @@
+{
+  "languages": {
+    "C++": {
+      "language_servers": ["clangd"],
+      "formatter": "language_server"
+    },
+    "C": {
+      "language_servers": ["clangd"],
+      "formatter": "language_server"
+    }
+  },
+  "lsp": {
+    "clangd": {
+      "binary": {
+        "path": "/usr/bin/clangd"
+      },
+      "initialization_options": {
+        "clangdFileStatus": true,
+        "fallbackFlags": ["-std=c++17"]
+      }
+    }
+  },
+  "file_types": {
+    "C++": ["cpp", "h", "hpp", "cc", "cxx"]
+  },
+  "tab_size": 4,
+  "hard_tabs": false
+}

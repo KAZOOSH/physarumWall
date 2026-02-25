@@ -1,0 +1,10 @@
+[
+  {
+    "label": "Debug wallProjection",
+    "adapter": "GDB",
+    "request": "launch",
+    "program": "/home/brian/Dev/of_v20260214_linux64_gcc6_release/apps/physarumWall/wallProjection/bin/wallProjection_debug",
+    "cwd": "/home/brian/Dev/of_v20260214_linux64_gcc6_release/apps/physarumWall/wallProjection",
+    "args": []
+  }
+]
