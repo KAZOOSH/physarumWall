@@ -6,6 +6,10 @@ and tracking through lidar sensors by
 
 The project is based on [openFrameworks 0.12](https://openframeworks.cc/).
 
+
+## License:
+License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License
+
 ## Installation
 ### Visual part
 * you need (openFrameworks 0.12)[https://openframeworks.cc/]
