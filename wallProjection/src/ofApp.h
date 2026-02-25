@@ -11,6 +11,8 @@
 #include "LidarController.h"
 #include "StreamManager.h"
 
+
+
 class ofApp : public ofBaseApp{
 
 public:
@@ -31,12 +33,10 @@ public:
     void dragEvent(ofDragInfo dragInfo);
     void gotMessage(ofMessage msg);
 
-        void drawWindow2(ofEventArgs& args);
-    void drawWindow3(ofEventArgs& args);
-    void drawWindow4(ofEventArgs& args);
-    void keyPressedWindow2(ofKeyEventArgs& args);
-    void keyPressedWindow3(ofKeyEventArgs& args);
-    void keyPressedWindow4(ofKeyEventArgs& args);
+    void drawWindow(int screenId, ofEventArgs& args);
+    void drawDebugWindow(ofEventArgs& args);
+    void keyPressedWindow(int screenId, ofKeyEventArgs& args);
+    void keyPressedDebugWindow(ofKeyEventArgs& args);
     void exit();
 
     void onOscSendEvent(ofxOscMessage& m);

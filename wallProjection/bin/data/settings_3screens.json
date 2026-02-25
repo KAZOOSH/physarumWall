@@ -1,297 +1,240 @@
 {
-    "lidars": [
-        {
-            "environmentFile": "env_left.txt",
-            "minDistEnvironment": 100,
-            "mirror": false,
-            "port": 40013,
-            "position": [
-                1500,
-                2760
-            ],
-            "rotation": 0,
-            "screenId": "left"
+  "debug": {
+    "debugScreen": true
+  },
+  "lidars": [
+    {
+      "environmentFile": "env_left.txt",
+      "minDistEnvironment": 100,
+      "mirror": false,
+      "port": 40013,
+      "position": [1500, 2760],
+      "rotation": 0,
+      "screenId": "left"
+    },
+    {
+      "environmentFile": "env_enter.txt",
+      "minDistEnvironment": 70,
+      "mirror": false,
+      "port": 40001,
+      "position": [3910, 2760],
+      "rotation": 0,
+      "screenId": "center"
+    },
+    {
+      "environmentFile": "env_center.txt",
+      "minDistEnvironment": 70,
+      "mirror": false,
+      "port": 40002,
+      "position": [8460, 2790],
+      "rotation": 0,
+      "screenId": "right"
+    }
+  ],
+  "network": {
+    "messages": {
+      "x": {
+        "center": {
+          "channel": 0,
+          "note": [48, 72]
         },
-        {
-            "environmentFile": "env_enter.txt",
-            "minDistEnvironment": 70,
-            "mirror": false,
-            "port": 40001,
-            "position": [
-                3910,
-                2760
-            ],
-            "rotation": 0,
-            "screenId": "center"
+        "left": {
+          "channel": 1,
+          "note": [36, 60]
         },
-        {
-            "environmentFile": "env_center.txt",
-            "minDistEnvironment": 70,
-            "mirror": false,
-            "port": 40002,
-            "position": [
-                8460,
-                2790
-            ],
-            "rotation": 0,
-            "screenId": "right"
+        "right": {
+          "channel": 2,
+          "note": [60, 84]
         }
+      },
+      "y": {
+        "ccNumber": 1,
+        "note": [0, 127]
+      }
+    },
+    "oscOut": [
+      {
+        "channel": "midi",
+        "ip": "192.168.1.242",
+        "port": 8000
+      },
+      {
+        "channel": "valueUpdate",
+        "ip": "127.0.0.1",
+        "port": 3333
+      }
     ],
-    "network": {
-        "messages": {
-            "x": {
-                "center": {
-                    "channel": 0,
-                    "note": [
-                        48,
-                        72
-                    ]
-                },
-                "left": {
-                    "channel": 1,
-                    "note": [
-                        36,
-                        60
-                    ]
-                },
-                "right": {
-                    "channel": 2,
-                    "note": [
-                        60,
-                        84
-                    ]
-                }
-            },
-            "y": {
-                "ccNumber": 1,
-                "note": [
-                    0,
-                    127
-                ]
-            }
-        },
-        "oscOut": [
-            {
-                "channel": "midi",
-                "ip": "192.168.1.242",
-                "port": 8000
-            },
-            {
-                "channel": "valueUpdate",
-                "ip": "127.0.0.1",
-                "port": 3333
-            }
-        ],
-        "oscPortIn": 8888
+    "oscPortIn": 8888
+  },
+  "physarum": {
+    "action": {
+      "size": [0.01, 0.1]
     },
-    "physarum": {
-        "action": {
-            "size": [
-                0.01,
-                0.1
-            ]
+    "particleMultiplicator": 1.0,
+    "tmaxCangeScenario": 80,
+    "tminChangeScenario": 20
+  },
+  "quadwarp": {
+    "0": {
+      "dst": [
+        {
+          "x": 576.0,
+          "y": 21.0
         },
-        "particleMultiplicator": 1.0,
-        "tmaxCangeScenario": 80,
-        "tminChangeScenario": 20
-    },
-    "quadwarp": {
-        "0": {
-            "dst": [
-                {
-                    "x": 576.0,
-                    "y": 21.0
-                },
-                {
-                    "x": 1150.699951171875,
-                    "y": 16.30001449584961
-                },
-                {
-                    "x": 1159.899169921875,
-                    "y": 1025.1982421875
-                },
-                {
-                    "x": 589.0,
-                    "y": 1033.0
-                }
-            ],
-            "src": [
-                {
-                    "x": 0.0,
-                    "y": 0.0
-                },
-                {
-                    "x": 1920.0,
-                    "y": 0.0
-                },
-                {
-                    "x": 1920.0,
-                    "y": 1080.0
-                },
-                {
-                    "x": 0.0,
-                    "y": 1080.0
-                }
-            ]
+        {
+          "x": 1150.699951171875,
+          "y": 16.30001449584961
         },
-        "1": {
-            "dst": [
-                {
-                    "x": 42.0,
-                    "y": 11.699999809265137
-                },
-                {
-                    "x": 1607.0,
-                    "y": 2.0
-                },
-                {
-                    "x": 1639.0,
-                    "y": 971.0
-                },
-                {
-                    "x": 35.0,
-                    "y": 1028.0
-                }
-            ],
-            "src": [
-                {
-                    "x": 0.0,
-                    "y": 0.0
-                },
-                {
-                    "x": 1920.0,
-                    "y": 0.0
-                },
-                {
-                    "x": 1920.0,
-                    "y": 1080.0
-                },
-                {
-                    "x": 0.0,
-                    "y": 1080.0
-                }
-            ]
+        {
+          "x": 1159.899169921875,
+          "y": 1025.1982421875
         },
-        "2": {
-            "dst": [
-                {
-                    "x": 64.0,
-                    "y": 192.0
-                },
-                {
-                    "x": 1792.0,
-                    "y": 198.0
-                },
-                {
-                    "x": 1771.0,
-                    "y": 1123.0
-                },
-                {
-                    "x": 70.0,
-                    "y": 1123.0
-                }
-            ],
-            "src": [
-                {
-                    "x": 0.0,
-                    "y": 0.0
-                },
-                {
-                    "x": 1920.0,
-                    "y": 0.0
-                },
-                {
-                    "x": 1920.0,
-                    "y": 1200.0
-                },
-                {
-                    "x": 0.0,
-                    "y": 1200.0
-                }
-            ]
+        {
+          "x": 589.0,
+          "y": 1033.0
         }
-    },
-    "screens": [
+      ],
+      "src": [
         {
-            "id": "left",
-            "position": [
-                0,
-                0
-            ],
-            "quad": "0",
-            "screenType": "screen",
-            "size": [
-                1920,
-                1080
-            ],
-            "texturePosition": [
-                0,
-                0
-            ],
-            "textureSize": [
-                631,
-                1080
-            ],
-            "worldDimensions": {
-                "height": 2790,
-                "width": 1630,
-                "x": 0,
-                "y": 0
-            }
+          "x": 0.0,
+          "y": 0.0
         },
         {
-            "id": "center",
-            "position": [
-                1921,
-                0
-            ],
-            "quad": "0",
-            "screenType": "screen",
-            "size": [
-                1920,
-                1080
-            ],
-            "texturePosition": [
-                631,
-                0
-            ],
-            "textureSize": [
-                1700,
-                1080
-            ],
-            "worldDimensions": {
-                "height": 2790,
-                "width": 4390,
-                "x": 2800,
-                "y": 0
-            }
+          "x": 1920.0,
+          "y": 0.0
         },
         {
-            "id": "right",
-            "position": [
-                3841,
-                0
-            ],
-            "quad": "1",
-            "screenType": "screen",
-            "size": [
-                1920,
-                1200
-            ],
-            "texturePosition": [
-                2330,
-                0
-            ],
-            "textureSize": [
-                1954,
-                1080
-            ],
-            "worldDimensions": {
-                "height": 2790,
-                "width": 5050,
-                "x": 6020,
-                "y": 0
-            }
+          "x": 1920.0,
+          "y": 1080.0
+        },
+        {
+          "x": 0.0,
+          "y": 1080.0
         }
-    ]
+      ]
+    },
+    "1": {
+      "dst": [
+        {
+          "x": 42.0,
+          "y": 11.699999809265137
+        },
+        {
+          "x": 1607.0,
+          "y": 2.0
+        },
+        {
+          "x": 1639.0,
+          "y": 971.0
+        },
+        {
+          "x": 35.0,
+          "y": 1028.0
+        }
+      ],
+      "src": [
+        {
+          "x": 0.0,
+          "y": 0.0
+        },
+        {
+          "x": 1920.0,
+          "y": 0.0
+        },
+        {
+          "x": 1920.0,
+          "y": 1080.0
+        },
+        {
+          "x": 0.0,
+          "y": 1080.0
+        }
+      ]
+    },
+    "2": {
+      "dst": [
+        {
+          "x": 64.0,
+          "y": 192.0
+        },
+        {
+          "x": 1792.0,
+          "y": 198.0
+        },
+        {
+          "x": 1771.0,
+          "y": 1123.0
+        },
+        {
+          "x": 70.0,
+          "y": 1123.0
+        }
+      ],
+      "src": [
+        {
+          "x": 0.0,
+          "y": 0.0
+        },
+        {
+          "x": 1920.0,
+          "y": 0.0
+        },
+        {
+          "x": 1920.0,
+          "y": 1200.0
+        },
+        {
+          "x": 0.0,
+          "y": 1200.0
+        }
+      ]
+    }
+  },
+  "screens": [
+    {
+      "id": "left",
+      "position": [0, 0],
+      "quad": "0",
+      "screenType": "screen",
+      "size": [1920, 1080],
+      "texturePosition": [0, 0],
+      "textureSize": [631, 1080],
+      "worldDimensions": {
+        "height": 2790,
+        "width": 1630,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "center",
+      "position": [1921, 0],
+      "quad": "0",
+      "screenType": "screen",
+      "size": [1920, 1080],
+      "texturePosition": [631, 0],
+      "textureSize": [1700, 1080],
+      "worldDimensions": {
+        "height": 2790,
+        "width": 4390,
+        "x": 2800,
+        "y": 0
+      }
+    },
+    {
+      "id": "right",
+      "position": [3841, 0],
+      "quad": "1",
+      "screenType": "screen",
+      "size": [1920, 1200],
+      "texturePosition": [2330, 0],
+      "textureSize": [1954, 1080],
+      "worldDimensions": {
+        "height": 2790,
+        "width": 5050,
+        "x": 6020,
+        "y": 0
+      }
+    }
+  ]
 }

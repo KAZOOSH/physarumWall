@@ -19,12 +19,26 @@ void StreamManager::setup(const ofJson& settings) {
     streamPixels.allocate(streamWidth, streamHeight, OF_PIXELS_RGBA);
 }
 
-void StreamManager::update(ofTexture& texture) {
+void StreamManager::update(ofTexture& texture, ofRectangle srcRect) {
     if (!isStreaming || !ffmpegPipe) return;
     if (ofGetElapsedTimef() - lastStreamTime >= 1.0f / streamFps) {
         if (streamMutex.try_lock()) {
             lastStreamTime = ofGetElapsedTimef();
-            texture.readToPixels(streamPixels);
+            if (srcRect.width > 0 && srcRect.height > 0) {
+                if (!cropFbo.isAllocated() ||
+                    (int)cropFbo.getWidth()  != streamWidth ||
+                    (int)cropFbo.getHeight() != streamHeight) {
+                    cropFbo.allocate(streamWidth, streamHeight, GL_RGBA);
+                }
+                cropFbo.begin();
+                ofClear(0);
+                texture.drawSubsection(0, 0, streamWidth, streamHeight,
+                    srcRect.x, srcRect.y, srcRect.width, srcRect.height);
+                cropFbo.end();
+                cropFbo.readToPixels(streamPixels);
+            } else {
+                texture.readToPixels(streamPixels);
+            }
             streamFrameReady = true;
             streamMutex.unlock();
             streamCv.notify_one();
@@ -32,11 +46,16 @@ void StreamManager::update(ofTexture& texture) {
     }
 }
 
-void StreamManager::start(ofTexture& texture) {
+void StreamManager::start(ofTexture& texture, ofRectangle srcRect) {
     if (isStreaming) return;
 
-    streamWidth  = (int)texture.getWidth();
-    streamHeight = (int)texture.getHeight();
+    if (srcRect.width > 0 && srcRect.height > 0) {
+        streamWidth  = (int)srcRect.width;
+        streamHeight = (int)srcRect.height;
+    } else {
+        streamWidth  = (int)texture.getWidth();
+        streamHeight = (int)texture.getHeight();
+    }
     if (streamWidth <= 0 || streamHeight <= 0) {
         ofLogError("StreamManager") << "Texture not ready for streaming";
         return;
@@ -116,9 +135,9 @@ void StreamManager::stop() {
     ofLogNotice("StreamManager") << "Streaming stopped";
 }
 
-void StreamManager::toggle(ofTexture& texture) {
+void StreamManager::toggle(ofTexture& texture, ofRectangle srcRect) {
     if (isStreaming) stop();
-    else start(texture);
+    else start(texture, srcRect);
 }
 
 void StreamManager::worker() {
