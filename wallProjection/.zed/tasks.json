@@ -1,0 +1,49 @@
+[
+  {
+    "label": "Build RELEASE",
+    "command": "make -j -s 2>&1",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "reveal": "always",
+    "hide": "on_success"
+  },
+  {
+    "label": "Run RELEASE",
+    "command": "make RunRelease 2>&1",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "reveal": "always"
+  },
+  {
+    "label": "Build and Run RELEASE",
+    "command": "make -j -s 2>&1 && make RunRelease 2>&1",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "reveal": "always"
+  },
+  {
+    "label": "Build DEBUG",
+    "command": "make Debug -j -s 2>&1",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "reveal": "always",
+    "hide": "on_success"
+  },
+  {
+    "label": "Clean DEBUG",
+    "command": "make CleanDebug",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "reveal": "always",
+    "hide": "on_success"
+  },
+  {
+    "label": "Clean RELEASE",
+    "command": "make CleanRelease",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "reveal": "always",
+    "hide": "on_success"
+  },
+  {
+    "label": "Clean ALL",
+    "command": "make clean",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "reveal": "always",
+    "hide": "on_success"
+  }
+]

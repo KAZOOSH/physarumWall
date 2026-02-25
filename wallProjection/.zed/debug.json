@@ -1,0 +1,16 @@
+[
+  {
+    "label": "C++ Launch (GDB)",
+    "adapter": "GDB",
+    "request": "launch",
+    "program": "$ZED_WORKTREE_ROOT/bin/wallProjection_debug",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "build": "Build DEBUG"
+  },
+  {
+    "label": "C++ Attach (GDB)",
+    "adapter": "GDB",
+    "request": "attach",
+    "pid": "${command:pickProcess}"
+  }
+]

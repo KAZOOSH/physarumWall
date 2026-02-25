@@ -1,0 +1,26 @@
+{
+  "languages": {
+    "C++": {
+      "tab_size": 4,
+      "hard_tabs": true,
+      "format_on_save": "off"
+    },
+    "C": {
+      "tab_size": 4,
+      "hard_tabs": true,
+      "format_on_save": "off"
+    }
+  },
+  "lsp": {
+    "clangd": {
+      "binary": {
+        "arguments": [
+          "--background-index",
+          "--clang-tidy=false",
+          "--header-insertion=never",
+          "--completion-style=detailed"
+        ]
+      }
+    }
+  }
+}
