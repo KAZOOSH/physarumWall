@@ -1,11 +1,5 @@
 #include "ofApp.h"
 
-#ifdef __linux__
-#include <dirent.h>
-#include <fcntl.h>
-#include <csignal>
-#endif
-
 //--------------------------------------------------------------
 void ofApp::setup(){
     settings = ofLoadJson("settings.json");
@@ -55,17 +49,7 @@ void ofApp::setup(){
     textureCreation = shared_ptr<Physarum>(new Physarum());
     textureCreation->setup(settings);
 
-    // streaming config (optional block in settings.json)
-    if (settings.contains("streaming")) {
-        auto& sc = settings["streaming"];
-        streamWidth   = sc.value("width",    streamWidth);
-        streamHeight  = sc.value("height",   streamHeight);
-        streamFps     = sc.value("fps",      streamFps);
-        streamEncoder = sc.value("encoder",  streamEncoder);
-        streamUrl     = sc.value("url",      streamUrl);
-        streamBitrate = sc.value("bitrate",  streamBitrate);
-    }
-    streamPixels.allocate(streamWidth, streamHeight, OF_PIXELS_RGBA);
+    streamManager.setup(settings);
 
     mouseInput = shared_ptr<MouseInput>(new MouseInput());
     mouseInput->setup(settings);
@@ -102,19 +86,7 @@ void ofApp::update(){
 
 
 
-    // --- streaming: rate-limited GPU readback + signal worker thread ---
-    if (isStreaming && ffmpegPipe) {
-        if (ofGetElapsedTimef() - lastStreamTime >= 1.0f / streamFps) {
-            // try_lock: skip frame if worker is mid-copy to avoid blocking GL thread
-            if (streamMutex.try_lock()) {
-                lastStreamTime = ofGetElapsedTimef();
-                textureCreation->getTexture().readToPixels(streamPixels);
-                streamFrameReady = true;
-                streamMutex.unlock();
-                streamCv.notify_one();
-            }
-        }
-    }
+    streamManager.update(textureCreation->getTexture());
 
    // check for waiting messages
 	while(receiver.hasWaitingMessages()){
@@ -140,16 +112,6 @@ void ofApp::draw(){
         ofPopStyle();
     }
 
-    if (isCaptureTexture){
-        string filename = "capture/";
-        if(nImagesCaptured <10) filename+="0";
-        if(nImagesCaptured <100) filename+="0";
-        if(nImagesCaptured <1000) filename+="0";
-        filename += (ofToString(nImagesCaptured));
-        filename +=".png";
-        textureCreation->saveTextureToFile(filename);
-        nImagesCaptured++;
-    }
 }
 
 
@@ -188,7 +150,7 @@ void ofApp::keyPressedWindow4(ofKeyEventArgs &args)
 
 void ofApp::exit()
 {
-    stopStreaming();
+    streamManager.stop();
     for (size_t i = 0; i < warper.size(); i++)
     {
         warper[i].save(ofToString(i), "settings.json");
@@ -213,118 +175,6 @@ void ofApp::onOscSendEvent(ofxOscMessage &m)
 
 
 
-void ofApp::startStreaming() {
-    if (isStreaming) return;
-
-    streamWidth  = (int)textureCreation->getTexture().getWidth();
-    streamHeight = (int)textureCreation->getTexture().getHeight();
-    if (streamWidth <= 0 || streamHeight <= 0) {
-        ofLogError("ofApp") << "Texture not ready for streaming";
-        return;
-    }
-    if (!streamPixels.isAllocated() ||
-        (int)streamPixels.getWidth()  != streamWidth ||
-        (int)streamPixels.getHeight() != streamHeight) {
-        streamPixels.allocate(streamWidth, streamHeight, OF_PIXELS_RGBA);
-    }
-
-    // Encoder flags are for h264_nvenc (low-latency).
-    // For CPU encoding swap encoder to libx264 and flags to:
-    //   -preset ultrafast -tune zerolatency
-    // Add -vf vflip if the stream appears upside-down.
-    bool isNvenc = (streamEncoder.find("nvenc") != std::string::npos);
-    bool isRtmp  = (streamUrl.rfind("rtmp", 0) == 0);
-
-    std::string encoderFlags = isNvenc
-        ? " -preset llhq -tune ll"
-        : " -preset ultrafast -tune zerolatency";
-
-    std::string outputFlags = isRtmp
-        ? " -f flv"
-        : " -rtsp_transport tcp -f rtsp";
-
-    std::string cmd =
-        "/usr/bin/ffmpeg -y"
-        " -f rawvideo -pix_fmt rgba"
-        " -s " + ofToString(streamWidth) + "x" + ofToString(streamHeight) +
-        " -r " + ofToString(streamFps) +
-        " -i pipe:0"
-        " -c:v " + streamEncoder +
-        encoderFlags +
-        " -bf 0"
-        " -g " + ofToString(streamFps) +
-        " -b:v " + streamBitrate +
-        outputFlags + " " + streamUrl +
-        " 2>/tmp/ffmpeg_stream.log";
-
-#ifdef __linux__
-    // Mark all open FDs as close-on-exec so the FFmpeg child process does not
-    // inherit the Wayland/X11 display connection (causes display errors).
-    {
-        DIR* fd_dir = opendir("/proc/self/fd");
-        if (fd_dir) {
-            int dir_fd = dirfd(fd_dir);
-            struct dirent* ent;
-            while ((ent = readdir(fd_dir)) != nullptr) {
-                int fd = atoi(ent->d_name);
-                if (fd > 2 && fd != dir_fd) {
-                    int flags = fcntl(fd, F_GETFD);
-                    if (flags != -1)
-                        fcntl(fd, F_SETFD, flags | FD_CLOEXEC);
-                }
-            }
-            closedir(fd_dir);
-        }
-    }
-#endif
-
-    ofLogNotice("ofApp") << "FFmpeg cmd: " << cmd;
-    signal(SIGPIPE, SIG_IGN);  // prevent broken pipe from killing the process
-    ffmpegPipe = popen(cmd.c_str(), "w");
-    if (!ffmpegPipe) {
-        ofLogError("ofApp") << "Failed to open FFmpeg pipe: " << cmd;
-        return;
-    }
-    streamRunning = true;
-    isStreaming   = true;
-    streamThread  = std::thread(&ofApp::streamWorker, this);
-    ofLogNotice("ofApp") << "Streaming -> " << streamUrl
-                         << " (" << streamWidth << "x" << streamHeight
-                         << " @ " << streamFps << "fps, " << streamEncoder << ")";
-}
-
-void ofApp::stopStreaming() {
-    if (!isStreaming) return;
-    isStreaming   = false;
-    streamRunning = false;
-    streamCv.notify_all();
-    if (streamThread.joinable()) streamThread.join();
-    if (ffmpegPipe) { pclose(ffmpegPipe); ffmpegPipe = nullptr; }
-    ofLogNotice("ofApp") << "Streaming stopped";
-}
-
-// Worker thread: waits for a new frame, copies pixels under the mutex,
-// then writes to the FFmpeg pipe without holding the lock.
-void ofApp::streamWorker() {
-    ofPixels localBuf;
-    while (streamRunning) {
-        {
-            std::unique_lock<std::mutex> lock(streamMutex);
-            streamCv.wait(lock, [this]{ return streamFrameReady || !streamRunning; });
-            if (!streamRunning) break;
-            localBuf = streamPixels;
-            streamFrameReady = false;
-        }
-        size_t written = fwrite(localBuf.getData(), 1, localBuf.size(), ffmpegPipe);
-        if (written == 0) {
-            ofLogError("ofApp") << "FFmpeg pipe write failed — stopping stream";
-            streamRunning = false;
-            isStreaming = false;
-            break;
-        }
-        fflush(ffmpegPipe);
-    }
-}
 
 void ofApp::drawScreen(int screenId)
 {
@@ -446,16 +296,12 @@ void ofApp::processKeyPressedEvent(int key, int screenId)
         ofToggleFullscreen();
     }
     if (key == 't' || key == 'T') {
-        if (isStreaming) stopStreaming();
-        else startStreaming();
+        streamManager.toggle(textureCreation->getTexture());
     }
     if (key == 'q') {
         ofSetWindowPosition(0,0);
     }
 
-    if(key == 'l'){
-        isCaptureTexture = !isCaptureTexture;
-    }
 }
 
 

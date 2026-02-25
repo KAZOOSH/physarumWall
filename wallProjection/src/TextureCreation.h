@@ -19,7 +19,7 @@ public:
     virtual void setup(ofJson settings);
     virtual void update() = 0;
     virtual void draw() = 0;
-    ofTexture getTexture();
+    ofTexture& getTexture();
 
     void registerInputs(shared_ptr<GenericInput> input);
 

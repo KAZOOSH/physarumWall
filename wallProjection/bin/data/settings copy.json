@@ -219,6 +219,7 @@
                 0
             ],
             "quad": "0",
+            "screenType": "screen",
             "size": [
                 1920,
                 1080
@@ -245,6 +246,7 @@
                 0
             ],
             "quad": "0",
+            "screenType": "screen",
             "size": [
                 1920,
                 1080
@@ -271,6 +273,7 @@
                 0
             ],
             "quad": "1",
+            "screenType": "screen",
             "size": [
                 1920,
                 1080

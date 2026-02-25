@@ -9,11 +9,7 @@
 #include "GenericInput.h"
 #include "MouseInput.h"
 #include "LidarController.h"
-
-#include <thread>
-#include <mutex>
-#include <condition_variable>
-#include <atomic>
+#include "StreamManager.h"
 
 class ofApp : public ofBaseApp{
 
@@ -69,27 +65,6 @@ public:
   shared_ptr<MouseInput> mouseInput;
  // ofxOscReceiver receiver;
 
-    // --- FFmpeg RTSP streaming ---
-    void startStreaming();
-    void stopStreaming();
-    void streamWorker();
-
-    bool isStreaming = false;
-    FILE* ffmpegPipe = nullptr;
-
-    ofPixels streamPixels;          // GL thread writes here (under mutex)
-    std::mutex streamMutex;
-    std::condition_variable streamCv;
-    std::thread streamThread;
-    std::atomic<bool> streamRunning{false};
-    bool streamFrameReady = false;
-    float lastStreamTime = -999.f;
-
-    int streamWidth = 1920;
-    int streamHeight = 1080;
-    int streamFps = 30;
-    std::string streamEncoder = "h264_nvenc";
-    std::string streamUrl = "rtsp://0.0.0.0:8554/live";
-    std::string streamBitrate = "10M";
+    StreamManager streamManager;
 
 };

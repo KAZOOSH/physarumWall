@@ -13,7 +13,7 @@ void TextureCreation::setup(ofJson settings){
     fbo.allocate(settings["textureDim"][0],settings["textureDim"][1]);
 }
 
-ofTexture TextureCreation::getTexture()
+ofTexture& TextureCreation::getTexture()
 {
     return fbo.getTexture();
 }
