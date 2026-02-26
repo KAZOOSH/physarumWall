@@ -404,7 +404,7 @@ bool Physarum::activeTransition()
 
 void Physarum::updateInputs(ofTouchEventArgs &t)
 {
-	/*
+
     // Create a vector from the map entries
     std::vector<std::pair<int, std::tuple<long, ofTouchEventArgs>>> vec(touches.begin(), touches.end());
 
@@ -446,7 +446,7 @@ void Physarum::updateInputs(ofTouchEventArgs &t)
             spawn[i] = 0;
         }
     }
-    */
+
     // cout << actionsX[0] << " , " << actionsY[0] << endl;
 }
 
