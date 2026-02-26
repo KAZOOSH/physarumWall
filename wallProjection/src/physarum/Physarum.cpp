@@ -42,6 +42,7 @@ void Physarum::setup(ofJson settings)
     trailWriteBuffer.allocate(simulationWidth, simulationHeight, GL_RG16F);
     fboDisplay.allocate(simulationWidth, simulationHeight, GL_RGBA8);
 
+    // resets particle counts
     setterShader.setupShaderFromFile(GL_COMPUTE_SHADER, "shaders/computeshader_setter.glsl");
     setterShader.linkProgram();
 
@@ -53,6 +54,24 @@ void Physarum::setup(ofJson settings)
 
     blurShader.setupShaderFromFile(GL_COMPUTE_SHADER, "shaders/computeshader_blur.glsl");
     blurShader.linkProgram();
+
+    jfaInitShader.setupShaderFromFile(GL_COMPUTE_SHADER, "shaders/computeshader_jfa_init.glsl");
+    jfaInitShader.linkProgram();
+
+    jfaShader.setupShaderFromFile(GL_COMPUTE_SHADER, "shaders/computeshader_jfa.glsl");
+    jfaShader.linkProgram();
+
+    jfaDistShader.setupShaderFromFile(GL_COMPUTE_SHADER, "shaders/computeshader_jfa_dist.glsl");
+    jfaDistShader.linkProgram();
+
+    jfaFboA.allocate(simulationWidth, simulationHeight, GL_RG32F);
+    jfaFboB.allocate(simulationWidth, simulationHeight, GL_RG32F);
+    distanceFbo.allocate(simulationWidth, simulationHeight, GL_RG16F);
+
+    trailMapShader.setupShaderFromFile(GL_COMPUTE_SHADER, "shaders/computeshader_trailmap.glsl");
+    trailMapShader.linkProgram();
+    trailMapFbo.allocate(simulationWidth, simulationHeight, GL_RGBA8);
+    trailMapFbo.getTexture().bindAsImage(7, GL_WRITE_ONLY);
 
     particles.resize(nParticles * PARTICLE_PARAMETERS_COUNT);
     float marginx = 3;
@@ -78,6 +97,7 @@ void Physarum::setup(ofJson settings)
     particlesBuffer.bindBase(GL_SHADER_STORAGE_BUFFER, 2);
     counterBuffer.bindBase(GL_SHADER_STORAGE_BUFFER, 3);
     fboDisplay.getTexture().bindAsImage(4, GL_WRITE_ONLY);
+    distanceFbo.getTexture().bindAsImage(6, GL_READ_ONLY);
 
     for (int i = 0; i < MAX_NUMBER_OF_WAVES; i++)
     {
@@ -93,7 +113,6 @@ void Physarum::setup(ofJson settings)
         randomSpawnYarray[i] = simulationHeight / 2;
     }
 
-    numberOfGamepads = 0;
 
     std::cout << "Number of points : " << pointsDataManager.getNumberOfPoints() << std::endl;
 
@@ -123,6 +142,42 @@ void Physarum::setup(ofJson settings)
     };
 }
 
+void Physarum::reloadShaders()
+{
+    setterShader.setupShaderFromFile(GL_COMPUTE_SHADER, "shaders/computeshader_setter.glsl");
+    setterShader.linkProgram();
+
+    depositShader.setupShaderFromFile(GL_COMPUTE_SHADER, "shaders/computeshader_deposit.glsl");
+    depositShader.linkProgram();
+
+    moveShader.setupShaderFromFile(GL_COMPUTE_SHADER, "shaders/computeshader_move.glsl");
+    moveShader.linkProgram();
+
+    blurShader.setupShaderFromFile(GL_COMPUTE_SHADER, "shaders/computeshader_blur.glsl");
+    blurShader.linkProgram();
+
+    jfaInitShader.setupShaderFromFile(GL_COMPUTE_SHADER, "shaders/computeshader_jfa_init.glsl");
+    jfaInitShader.linkProgram();
+
+    jfaShader.setupShaderFromFile(GL_COMPUTE_SHADER, "shaders/computeshader_jfa.glsl");
+    jfaShader.linkProgram();
+
+    jfaDistShader.setupShaderFromFile(GL_COMPUTE_SHADER, "shaders/computeshader_jfa_dist.glsl");
+    jfaDistShader.linkProgram();
+
+    trailMapShader.setupShaderFromFile(GL_COMPUTE_SHADER, "shaders/computeshader_trailmap.glsl");
+    trailMapShader.linkProgram();
+
+    trailReadBuffer.getTexture().bindAsImage(0, GL_READ_ONLY);
+    trailWriteBuffer.getTexture().bindAsImage(1, GL_WRITE_ONLY);
+    particlesBuffer.bindBase(GL_SHADER_STORAGE_BUFFER, 2);
+    counterBuffer.bindBase(GL_SHADER_STORAGE_BUFFER, 3);
+    fboDisplay.getTexture().bindAsImage(4, GL_WRITE_ONLY);
+    distanceFbo.getTexture().bindAsImage(6, GL_READ_ONLY);
+    simulationParametersBuffer.bindBase(GL_SHADER_STORAGE_BUFFER, 5);
+    trailMapFbo.getTexture().bindAsImage(7, GL_WRITE_ONLY);
+}
+
 void Physarum::paramsUpdate()
 {
     pointsDataManager.updateCurrentValuesFromTransitionProgress(currentTransitionProgress());
@@ -148,10 +203,60 @@ void Physarum::update()
         settingsChangeMode = 0;
     }
 
-    if (numberOfGamepads == 0)
-    {
-        curL2 = -1; // L2 for no "inertia" effect, when using keyboard only
+
+    curL2 = -1; // L2 for no "inertia" effect, when using keyboard only
+
+    // update objects fbo
+
+    objectsFbo.begin();
+    ofBackground(255);
+    ofSetColor(0);
+    ofDrawEllipse(1000, 500, 100, 100);
+    for (auto& t:touches) {
+    	auto touch = std::get<1>(t.second);
+    	ofDrawEllipse(touch.x, touch.y, touch.width, touch.height);
     }
+    objectsFbo.end();
+
+    // JFA distance field from objectsFbo
+    // Init: seed free pixels with their own coords
+    objectsFbo.getTexture().bindAsImage(0, GL_READ_ONLY);
+    jfaFboA.getTexture().bindAsImage(1, GL_WRITE_ONLY);
+    jfaInitShader.begin();
+    jfaInitShader.dispatchCompute(simulationWidth / 32, simulationHeight / 32, 1);
+    jfaInitShader.end();
+
+    // JFA passes: step = width/2, width/4, ..., 1
+    bool pingPong = false;
+    for (int step = std::max(simulationWidth, simulationHeight) / 2; step >= 1; step /= 2) {
+        ofFbo& src = pingPong ? jfaFboB : jfaFboA;
+        ofFbo& dst = pingPong ? jfaFboA : jfaFboB;
+        src.getTexture().bindAsImage(0, GL_READ_ONLY);
+        dst.getTexture().bindAsImage(1, GL_WRITE_ONLY);
+        jfaShader.begin();
+        jfaShader.setUniform1i("stepSize", step);
+        jfaShader.setUniform1i("width", simulationWidth);
+        jfaShader.setUniform1i("height", simulationHeight);
+        jfaShader.dispatchCompute(simulationWidth / 32, simulationHeight / 32, 1);
+        jfaShader.end();
+        pingPong = !pingPong;
+    }
+
+    // Convert final seed map to normalised distance
+    ofFbo& jfaResult = pingPong ? jfaFboB : jfaFboA;
+    jfaResult.getTexture().bindAsImage(0, GL_READ_ONLY);
+    distanceFbo.getTexture().bindAsImage(1, GL_WRITE_ONLY);
+    jfaDistShader.begin();
+    jfaDistShader.setUniform1i("width", simulationWidth);
+    jfaDistShader.setUniform1i("height", simulationHeight);
+    jfaDistShader.setUniform1f("maxDist", 1000.0f);
+    jfaDistShader.dispatchCompute(simulationWidth / 32, simulationHeight / 32, 1);
+    jfaDistShader.end();
+
+    // Restore bindings for physarum shaders
+    trailReadBuffer.getTexture().bindAsImage(0, GL_READ_ONLY);
+    trailWriteBuffer.getTexture().bindAsImage(1, GL_WRITE_ONLY);
+    distanceFbo.getTexture().bindAsImage(6, GL_READ_ONLY);
 
     setterShader.begin();
     setterShader.setUniform1i("width", trailReadBuffer.getWidth());
@@ -205,6 +310,14 @@ void Physarum::update()
     depositShader.dispatchCompute(simulationWidth / 32, simulationHeight / 32, 1);
     depositShader.end();
 
+
+    trailReadBuffer.getTexture().bindAsImage(0, GL_READ_ONLY);
+    trailMapShader.begin();
+    trailMapShader.setUniform1i("width", simulationWidth);
+    trailMapShader.setUniform1i("height", simulationHeight);
+    trailMapShader.dispatchCompute(simulationWidth / 32, simulationHeight / 32, 1);
+    trailMapShader.end();
+
     trailReadBuffer.getTexture().bindAsImage(1, GL_WRITE_ONLY);
     trailWriteBuffer.getTexture().bindAsImage(0, GL_READ_ONLY);
 
@@ -216,6 +329,8 @@ void Physarum::update()
     blurShader.setUniform1f("time", time);
     blurShader.dispatchCompute(trailReadBuffer.getWidth() / 32, trailReadBuffer.getHeight() / 32, 1);
     blurShader.end();
+
+
 
     spawn = {};
     if (particlesSpawn)
@@ -234,11 +349,11 @@ void Physarum::update()
         changeScenario();
     }
 
-    fbo.begin();
+    outputFbo.begin();
     ofPushMatrix();
     fboDisplay.draw(0, 0);
     ofPopMatrix();
-    fbo.end();
+    outputFbo.end();
 }
 
 // DRAW
@@ -289,6 +404,7 @@ bool Physarum::activeTransition()
 
 void Physarum::updateInputs(ofTouchEventArgs &t)
 {
+	/*
     // Create a vector from the map entries
     std::vector<std::pair<int, std::tuple<long, ofTouchEventArgs>>> vec(touches.begin(), touches.end());
 
@@ -330,6 +446,7 @@ void Physarum::updateInputs(ofTouchEventArgs &t)
             spawn[i] = 0;
         }
     }
+    */
     // cout << actionsX[0] << " , " << actionsY[0] << endl;
 }
 
@@ -341,20 +458,13 @@ void Physarum::remapTouchPosition(ofTouchEventArgs &t)
 
 void Physarum::onTouchDown(ofTouchEventArgs &ev)
 {
-    // coudt << ev.x << " : " << ev.y;
+
 
     remapTouchPosition(ev);
     std::tuple<long,ofTouchEventArgs> t {ofGetElapsedTimeMillis(),ev};
     touches[ev.id] = t;
 
-    // cout << "   ->   " << ev.x << " : " << ev.y <<endl;
-
     updateInputs(ev);
-
-    // curActionX = ofMap(ev.x, 0, ofGetWidth(), 0, simulationWidth, true);
-    // curActionY = ofMap(ev.y, 0, ofGetHeight(), 0, simulationHeight, true);
-
-    // actionTriggerWave();
     actionSpawnParticles(1);
 }
 void Physarum::onTouchUp(ofTouchEventArgs &ev)
@@ -363,11 +473,7 @@ void Physarum::onTouchUp(ofTouchEventArgs &ev)
     updateInputs(ev);
 
     touches.erase(ev.id);
-    /* for (auto& touch:touches)
-     {
-         cout << touch.first << "  " << get<0>(touch.second) <<endl;
-     }
-     cout << endl;*/
+
 }
 
 void Physarum::onTouchMove(ofTouchEventArgs &ev)
@@ -526,4 +632,19 @@ void Physarum::sendChangeScenario()
 
 
 
+}
+
+ofTexture& Physarum::getDebugTexture(string id){
+	if (id == "trail") {
+		return trailReadBuffer.getTexture();
+	}else if (id == "display"){
+		return trailWriteBuffer.getTexture();
+	}else if(id == "distanceField"){
+		return distanceFbo.getTexture();
+	}else if(id == "trailMap"){
+		return trailMapFbo.getTexture();
+	}else{
+		ofLogError("id " + id + "does not exist, showing texture");
+		return outputFbo.getTexture();
+	}
 }

@@ -10,12 +10,22 @@ TextureCreation::~TextureCreation()
 }
 
 void TextureCreation::setup(ofJson settings){
-    fbo.allocate(settings["textureDim"][0],settings["textureDim"][1]);
+    outputFbo.allocate(settings["textureDim"][0],settings["textureDim"][1]);
+    objectsFbo.allocate(settings["textureDim"][0],settings["textureDim"][1],GL_RG16F);
 }
 
 ofTexture& TextureCreation::getTexture()
 {
-    return fbo.getTexture();
+    return outputFbo.getTexture();
+}
+
+ofTexture& TextureCreation::getObjectsFbo()
+{
+    return objectsFbo.getTexture();
+}
+ofTexture& TextureCreation::getDebugTexture(string id){
+	ofLogError("not implemented for that class, showing texture");
+	return outputFbo.getTexture();
 }
 
 
@@ -32,8 +42,8 @@ void TextureCreation::saveTextureToFile(string filename)
     ofPixels pixels;
 
     // Allocate pixels with the same size and format
-    pixels.allocate(fbo.getWidth(), fbo.getHeight(), OF_IMAGE_COLOR);
-    fbo.readToPixels(pixels); 
+    pixels.allocate(outputFbo.getWidth(), outputFbo.getHeight(), OF_IMAGE_COLOR);
+    outputFbo.readToPixels(pixels);
 
     ofSaveImage(pixels, filename);
 }

@@ -1,171 +1,139 @@
 {
-    "debug": {
-        "debugScreen": true
+  "debug": {
+    "debugScreen": true,
+    "position": [1920, 10]
+  },
+  "lidars": [
+    {
+      "environmentFile": "env_left.txt",
+      "minDistEnvironment": 100,
+      "mirror": false,
+      "port": 40013,
+      "position": [1035, 3230],
+      "rotation": 0,
+      "screenId": "center"
     },
-    "lidars": [
-        {
-            "environmentFile": "env_left.txt",
-            "minDistEnvironment": 100,
-            "mirror": false,
-            "port": 40013,
-            "position": [
-                1035,
-                3230
-            ],
-            "rotation": 0,
-            "screenId": "center"
-        },
-        {
-            "environmentFile": "env_enter.txt",
-            "minDistEnvironment": 70,
-            "mirror": false,
-            "port": 40001,
-            "position": [
-                3520,
-                3230
-            ],
-            "rotation": 0,
-            "screenId": "center"
-        }
+    {
+      "environmentFile": "env_enter.txt",
+      "minDistEnvironment": 70,
+      "mirror": false,
+      "port": 40001,
+      "position": [3520, 3230],
+      "rotation": 0,
+      "screenId": "center"
+    }
+  ],
+  "network": {
+    "messages": {
+      "x": {
+        "center": [
+          {
+            "channel": 1,
+            "max": 0.33,
+            "min": 0.0,
+            "note": [10, 60]
+          },
+          {
+            "channel": 0,
+            "max": 0.7,
+            "min": 0.33,
+            "note": [48, 72]
+          },
+          {
+            "channel": 2,
+            "max": 1.0,
+            "min": 0.7,
+            "note": [60, 84]
+          }
+        ]
+      },
+      "y": {
+        "ccNumber": 1,
+        "note": [0, 127]
+      }
+    },
+    "oscOut": [
+      {
+        "channel": "midi",
+        "ip": "192.168.11.128",
+        "port": 8000
+      },
+      {
+        "channel": "valueUpdate",
+        "ip": "127.0.0.1",
+        "port": 3333
+      },
+      {
+        "channel": "sync",
+        "ip": "192.168.11.71",
+        "port": 7001
+      }
     ],
-    "network": {
-        "messages": {
-            "x": {
-                "center": [
-                    {
-                        "channel": 1,
-                        "max": 0.33,
-                        "min": 0.0,
-                        "note": [
-                            10,
-                            60
-                        ]
-                    },
-                    {
-                        "channel": 0,
-                        "max": 0.7,
-                        "min": 0.33,
-                        "note": [
-                            48,
-                            72
-                        ]
-                    },
-                    {
-                        "channel": 2,
-                        "max": 1.0,
-                        "min": 0.7,
-                        "note": [
-                            60,
-                            84
-                        ]
-                    }
-                ]
-            },
-            "y": {
-                "ccNumber": 1,
-                "note": [
-                    0,
-                    127
-                ]
-            }
-        },
-        "oscOut": [
-            {
-                "channel": "midi",
-                "ip": "192.168.11.128",
-                "port": 8000
-            },
-            {
-                "channel": "valueUpdate",
-                "ip": "127.0.0.1",
-                "port": 3333
-            },
-            {
-                "channel": "sync",
-                "ip": "192.168.11.71",
-                "port": 7001
-            }
-        ],
-        "oscPortIn": 8888
+    "oscPortIn": 8888
+  },
+  "physarum": {
+    "action": {
+      "size": [0.01, 0.1]
     },
-    "physarum": {
-        "action": {
-            "size": [
-                0.01,
-                0.1
-            ]
-        },
-        "particleMultiplicator": 1.0,
-        "tmaxCangeScenario": 80,
-        "tminChangeScenario": 20
-    },
-    "quadwarp": {
-        "0": {
-            "dst": [
-                {
-                    "x": 1.0,
-                    "y": 3.0
-                },
-                {
-                    "x": 1920.0,
-                    "y": 0.0
-                },
-                {
-                    "x": 1920.0,
-                    "y": 1200.0
-                },
-                {
-                    "x": 0.0,
-                    "y": 1200.0
-                }
-            ],
-            "src": [
-                {
-                    "x": 0.0,
-                    "y": 0.0
-                },
-                {
-                    "x": 1920.0,
-                    "y": 0.0
-                },
-                {
-                    "x": 1920.0,
-                    "y": 1200.0
-                },
-                {
-                    "x": 0.0,
-                    "y": 1200.0
-                }
-            ]
-        }
-    },
-    "screens": [
+    "particleMultiplicator": 1.0,
+    "tmaxCangeScenario": 80,
+    "tminChangeScenario": 20
+  },
+  "quadwarp": {
+    "0": {
+      "dst": [
         {
-            "id": "center",
-            "position": [
-                1920,
-                0
-            ],
-            "quad": "0",
-            "screenType": "screen",
-            "size": [
-                1920,
-                1200
-            ],
-            "texturePosition": [
-                0,
-                0
-            ],
-            "textureSize": [
-                1920,
-                1200
-            ],
-            "worldDimensions": {
-                "height": 3320,
-                "width": 5460,
-                "x": 0,
-                "y": 0
-            }
+          "x": 1.0,
+          "y": 3.0
+        },
+        {
+          "x": 1920.0,
+          "y": 0.0
+        },
+        {
+          "x": 1920.0,
+          "y": 1200.0
+        },
+        {
+          "x": 0.0,
+          "y": 1200.0
         }
-    ]
+      ],
+      "src": [
+        {
+          "x": 0.0,
+          "y": 0.0
+        },
+        {
+          "x": 1920.0,
+          "y": 0.0
+        },
+        {
+          "x": 1920.0,
+          "y": 1200.0
+        },
+        {
+          "x": 0.0,
+          "y": 1200.0
+        }
+      ]
+    }
+  },
+  "screens": [
+    {
+      "id": "center",
+      "position": [1920, 0],
+      "quad": "0",
+      "screenType": "screen",
+      "size": [1920, 1200],
+      "texturePosition": [0, 0],
+      "textureSize": [1920, 1200],
+      "worldDimensions": {
+        "height": 3320,
+        "width": 5460,
+        "x": 0,
+        "y": 0
+      }
+    }
+  ]
 }

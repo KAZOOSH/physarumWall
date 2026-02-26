@@ -12,10 +12,10 @@ int main() {
 
 	// main window
 	settings.setSize(jScreens[0]["size"][0], jScreens[0]["size"][1]);
-	settings.setPosition(glm::vec2(jScreens[0]["position"][0], jScreens[0]["position"][1]));
+	settings.monitor = jScreens[0].value("monitor", 0);
+	settings.windowMode = jScreens[0].value("fullscreen", false) ? OF_FULLSCREEN : OF_WINDOW;
 	settings.resizable = true;
 	settings.decorated = false;
-	//settings.transparent = true;
 	settings.title = jScreens[0]["id"].get<string>();
 	auto mainWindow = ofCreateWindow(settings);
 	auto mainApp = make_shared<ofApp>();
@@ -26,14 +26,15 @@ int main() {
 		if (jScreens[i]["screenType"].get<string>() == "screen") {
 
 			settings.setSize(jScreens[i]["size"][0], jScreens[i]["size"][1]);
-			settings.setPosition(glm::vec2(jScreens[i]["position"][0], jScreens[i]["position"][1]));
+			settings.monitor = jScreens[i].value("monitor", i);
+			settings.windowMode = jScreens[i].value("fullscreen", false) ? OF_FULLSCREEN : OF_WINDOW;
 			settings.shareContextWith = mainWindow;
 			settings.title = jScreens[i]["id"].get<string>();
-			//settings.resizable = false;
 
 			auto window = ofCreateWindow(settings);
 			window->setVerticalSync(false);
 
+			mainApp->extraWindows.push_back(window);
 			ofApp * app = mainApp.get();
 			listeners.push_back(window->events().draw.newListener([app, i](ofEventArgs & args) { app->drawWindow(i, args); }));
 			listeners.push_back(window->events().keyPressed.newListener([app, i](ofKeyEventArgs & args) { app->keyPressedWindow(i, args); }));
@@ -43,7 +44,8 @@ int main() {
 	//debug window
 	if (jSettings["debug"]["debugScreen"].get<bool>() == true) {
 		settings.setSize(1920, 1080);
-		settings.setPosition(glm::vec2(0, 0));
+		settings.monitor = jSettings["debug"].value("monitor", 0);
+		settings.windowMode = OF_WINDOW;
 		settings.resizable = true;
 		settings.decorated = true;
 		settings.shareContextWith = mainWindow;

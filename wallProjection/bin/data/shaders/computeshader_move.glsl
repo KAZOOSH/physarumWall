@@ -3,7 +3,6 @@
 // By Etienne Jacob, License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License
 // Attribution to Sage Jenson's work explained in comments
 
-
 // warning: these be compatible with the c++ code
 #define MAX_NUMBER_OF_WAVES 5
 #define MAX_NUMBER_OF_RANDOM_SPAWN 7
@@ -33,7 +32,6 @@ uniform float waveSavedSigmas[MAX_NUMBER_OF_WAVES];
 uniform float mouseXchange;
 uniform float L2Action;
 
-
 uniform float spawnFraction;
 uniform int randomSpawnNumber;
 uniform float randomSpawnXarray[MAX_NUMBER_OF_RANDOM_SPAWN];
@@ -45,53 +43,60 @@ float curActionX;
 float curActionY;
 int spawnParticles;
 
-struct PointSettings{
-	int typeIndex;
+struct PointSettings {
+    int typeIndex;
 
-	float defaultScalingFactor;
+    float defaultScalingFactor;
 
-	float SensorDistance0;
-	float SD_exponent;
-	float SD_amplitude;
+    float SensorDistance0;
+    float SD_exponent;
+    float SD_amplitude;
 
-	float SensorAngle0;
-	float SA_exponent;
-	float SA_amplitude;
+    float SensorAngle0;
+    float SA_exponent;
+    float SA_amplitude;
 
-	float RotationAngle0;
-	float RA_exponent;
-	float RA_amplitude;
+    float RotationAngle0;
+    float RA_exponent;
+    float RA_amplitude;
 
-	float MoveDistance0;
-	float MD_exponent;
-	float MD_amplitude;
+    float MoveDistance0;
+    float MD_exponent;
+    float MD_amplitude;
 
-	float SensorBias1;
-	float SensorBias2;
+    float SensorBias1;
+    float SensorBias2;
 };
 
-layout(std430,binding=5) buffer parameters
+layout(std430, binding = 5) buffer parameters
 {
-	PointSettings params[];
+    PointSettings params[];
 };
 
-layout(rg16f,binding=0) uniform readonly image2D trailRead;
-layout(std430,binding=3) buffer mutex
+layout(rg16f, binding = 0) uniform readonly image2D trailRead;
+layout(std430, binding = 3) buffer mutex
 {
-	uint particlesCounter[];
+    uint particlesCounter[];
 };
 
-layout(std430, binding=2) buffer particle{
+layout(std430, binding = 2) buffer particle {
     uint particlesArray[];
 };
 
+//objects
+layout(rg16f, binding = 6) uniform readonly image2D objectRead;
 
+float gn(in vec2 coordinate, in float seed) {
+    return abs(fract(123.654 * sin(distance(coordinate * (seed + 0.118446744073709551614), vec2(0.118446744073709551614, 0.314159265358979323846264))) * 0.141421356237309504880169));
+}
+float random(vec2 st) {
+    return fract(0.5 + 0.5 * sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+}
+float random2(vec3 st) {
+    return fract(sin(dot(st.xyz, vec3(12.9898, 78.233, 151.7182))) * 43758.5453123);
+}
 
-float gn(in vec2 coordinate, in float seed) { return abs(fract(123.654*sin(distance(coordinate*(seed+0.118446744073709551614), vec2(0.118446744073709551614, 0.314159265358979323846264)))*0.141421356237309504880169));}
-float random(vec2 st) {return fract(0.5+0.5*sin(dot(st.xy,vec2(12.9898,78.233)))*43758.5453123);}
-float random2 (vec3 st) {return fract(sin(dot(st.xyz,vec3(12.9898,78.233, 151.7182))) * 43758.5453123);}
-
-float noise (vec3 st) {
+float noise(vec3 st) {
     vec3 i = floor(st);
     vec3 F = fract(st);
 
@@ -108,35 +113,42 @@ float noise (vec3 st) {
     // Smoothly interpolate the noise value
     vec3 u = F * F * (3.0 - 2.0 * F);
 
-    return mix(mix(mix( a, b, u.x),
-                   mix( c, d, u.x), u.y),
-               mix(mix( e, f, u.x),
-                   mix( g, h, u.x), u.y), u.z);
+    return mix(mix(mix(a, b, u.x),
+            mix(c, d, u.x), u.y),
+        mix(mix(e, f, u.x),
+            mix(g, h, u.x), u.y), u.z);
 }
-
-
-
 
 vec2 getRandomPos(vec2 particlePos)
 {
-	return vec2(width*gn(particlePos*13.436515/width,14.365475),height*gn(particlePos*12.765177/width+vec2(353.647,958.6515),35.6198849));
+    return vec2(width * gn(particlePos * 13.436515 / width, 14.365475), height * gn(particlePos * 12.765177 / width + vec2(353.647, 958.6515), 35.6198849));
 }
 
 float getGridValue(vec2 pos)
 {
-	return imageLoad(trailRead, ivec2(mod(pos.x + 0.5 + float(width),float(width)),mod(pos.y + 0.5 + float(height),float(height)))).x;
+    return imageLoad(trailRead, ivec2(mod(pos.x + 0.5 + float(width), float(width)), mod(pos.y + 0.5 + float(height), float(height)))).x;
 }
 
-float senseFromAngle(float angle,vec2 pos,float heading,float so)
+float senseFromAngle(float angle, vec2 pos, float heading, float so)
 {
-    return getGridValue(vec2(pos.x + so*cos(heading + angle),pos.y + so*sin(heading + angle)));
+    return getGridValue(vec2(pos.x + so * cos(heading + angle), pos.y + so * sin(heading + angle)));
 }
 
-float propagatedWaveFunction(float x,float sigma)
+float getObjectValue(vec2 pos)
 {
-	//float waveSigma = 0.5*(0.4 + 0.8*waveActionAreaSizeSigma);
-	float waveSigma = 0.15 + 0.4*sigma;
-	return float(x <= 0.)*exp(-x*x/waveSigma/waveSigma);
+    return imageLoad(objectRead, ivec2(mod(pos.x + 0.5 + float(width), float(width)), mod(pos.y + 0.5 + float(height), float(height)))).x;
+}
+
+float senseObjectFromAngle(float angle, vec2 pos, float heading, float so)
+{
+    return getObjectValue(vec2(pos.x + so * cos(heading + angle), pos.y + so * sin(heading + angle)));
+}
+
+float propagatedWaveFunction(float x, float sigma)
+{
+    //float waveSigma = 0.5*(0.4 + 0.8*waveActionAreaSizeSigma);
+    float waveSigma = 0.15 + 0.4 * sigma;
+    return float(x <= 0.) * exp(-x * x / waveSigma / waveSigma);
 }
 
 // This is the main shader.
@@ -145,264 +157,279 @@ float propagatedWaveFunction(float x,float sigma)
 // Counter increased with atomicAdd function to be able to do it with many particles in parallel.
 
 layout(local_size_x = 128, local_size_y = 1, local_size_z = 1) in;
-void main(){
+void main() {
+    PointSettings currentParams_1 = params[1]; // "Background Point" parameters
+    PointSettings currentParams_2 = params[0]; // "Pen Point" parameters
 
-	PointSettings currentParams_1 = params[1]; // "Background Point" parameters
-	PointSettings currentParams_2 = params[0]; // "Pen Point" parameters
+    vec2 particlePos = unpackUnorm2x16(particlesArray[3 * gl_GlobalInvocationID.x]) * vec2(width, height);
+    vec2 currAHeading = unpackUnorm2x16(particlesArray[3 * gl_GlobalInvocationID.x + 1]) * vec2(1.0, 2.0 * PI);
+    vec2 velocity = unpackHalf2x16(particlesArray[3 * gl_GlobalInvocationID.x + 2]);
 
-	vec2 particlePos = unpackUnorm2x16(particlesArray[3 * gl_GlobalInvocationID.x]) * vec2(width, height);
-	vec2 currAHeading = unpackUnorm2x16(particlesArray[3 * gl_GlobalInvocationID.x + 1]) * vec2(1.0, 2.0 * PI);
-	vec2 velocity = unpackHalf2x16(particlesArray[3 * gl_GlobalInvocationID.x + 2]);
+    float heading = currAHeading.y;
+    vec2 direction = vec2(cos(heading), sin(heading));
 
-	float heading = currAHeading.y;
-	vec2 direction = vec2(cos(heading), sin(heading));
+    // select closest action position
+    curActionX = actionsX[0];
+    curActionY = actionsY[0];
+    spawnParticles = spawn[0];
+    float dTemp = distance(particlePos, vec2(actionsX[0], actionsY[0]));
 
+    for (int i = 0; i < MAX_NUMBER_OF_INPUTS; i++) {
+        vec2 inputAction = vec2(actionsX[i], actionsY[i]);
+        float d = distance(particlePos, inputAction);
+        if (d < dTemp) {
+            curActionX = actionsX[i];
+            curActionY = actionsY[i];
+            spawnParticles = spawn[i];
+            d = dTemp;
+        }
+    }
 
-	// select closest action position
-	//curActionX = actionX;
-	//curActionY = actionY;
-	curActionX = actionsX[0];
-	curActionY = actionsY[0];
-	spawnParticles = spawn[0];
-	float dTemp = distance(particlePos,vec2(actionsX[0],actionsY[0]));
+    vec2 normalizedPosition = vec2(particlePos.x / width, particlePos.y / height);
+    vec2 normalizedActionPosition = vec2(curActionX / width, curActionY / height);
 
+    // some inputs for noise values used later (not important stuff)
+    vec2 positionForNoise1 = normalizedPosition;
+    positionForNoise1.x *= float(width) / height;
+    vec2 positionForNoise2 = positionForNoise1;
+    float noiseScale = 20.0;
+    positionForNoise1 *= noiseScale;
+    float noiseScale2 = 6.0;
+    positionForNoise2 *= noiseScale2;
 
-	for (int i=0; i<MAX_NUMBER_OF_INPUTS; i++){
-		vec2 inputAction = vec2(actionsX[i],actionsY[i]);
-		float d = distance(particlePos,inputAction);
-		if(d<dTemp){
-			curActionX = actionsX[i];
-			curActionY = actionsY[i];
-			spawnParticles = spawn[i];
-			d = dTemp;
-		}
-	}
+    // looking for "lerper" variable, the parameter for interpolation between the parameters of the 2 Points (Pen/Background)
+    vec2 positionFromAction = normalizedPosition - normalizedActionPosition;
+    positionFromAction.x *= float(width) / height;
+    float distanceNoiseFactor = (0.9 + 0.2 * noise(vec3(positionForNoise2.x, positionForNoise2.t, 0.6 * time))); // a bit of noise distortion on distance
+    float distanceFromAction = distance(positionFromAction, vec2(0)) * distanceNoiseFactor;
+    float lerper = exp(-distanceFromAction * distanceFromAction / actionAreaSizeSigma / actionAreaSizeSigma); // use of a gaussian function: 1 at the center, 0 far from the center
+    //lerper = diffDist<=actionAreaSizeSigma ? 1 : 0;
+    //lerper = particlePos.x/width;
 
+    // Section about the "trigerred waves" interaction, really a secondary feature
+    float waveSum = 0.;
 
-	vec2 normalizedPosition = vec2(particlePos.x/width,particlePos.y/height);
-	vec2 normalizedActionPosition = vec2(curActionX/width,curActionY/height);
+    for (int i = 0; i < MAX_NUMBER_OF_WAVES; i++)
+    {
+        int maxWaveTime = 5; // in seconds
+        if ((time - waveTriggerTimes[i]) <= maxWaveTime)
+        {
+            vec2 normalizedWaveCenterPosition = vec2(waveXarray[i] / width, waveYarray[i] / height);
+            vec2 relDiffWave = normalizedPosition - normalizedWaveCenterPosition;
+            relDiffWave.x *= float(width) / height;
+            float diffDistWave = distance(relDiffWave, vec2(0));
+            float noiseVariationFactor = (0.95 + 0.1 * noise(vec3(positionForNoise1.x, positionForNoise1.y, 0.3 * time)));
+            float angleToCenter = atan(relDiffWave.y, relDiffWave.x);
+            float dir = (i % 2 == 0) ? 1. : -1.;
 
+            float delay = -0.1 + diffDistWave / 0.3 * noiseVariationFactor + 0.4 * pow(0.5 + 0.5 * cos(18. * angleToCenter + 10.0 * dir * diffDistWave), 0.3);
+            float varWave = delay - (time - waveTriggerTimes[i]);
+            float sigmaVariation = pow(waveSavedSigmas[i], 0.75);
+            waveSum += 0.6 * propagatedWaveFunction(varWave, waveSavedSigmas[i]) * max(0., 1. - 0.3 * diffDistWave / sigmaVariation * noiseVariationFactor);
+        }
+    }
 
-	// some inputs for noise values used later (not important stuff)
-	vec2 positionForNoise1 = normalizedPosition;
-	positionForNoise1.x *= float(width)/height;
-	vec2 positionForNoise2 = positionForNoise1;
-	float noiseScale = 20.0;
-	positionForNoise1 *= noiseScale;
-	float noiseScale2 = 6.0;
-	positionForNoise2 *= noiseScale2;
+    waveSum = 1.7 * tanh(waveSum / 1.7) + 0.4 * tanh(4. * waveSum);
+    //lerper = mix(lerper,0.,tanh(5.*waveSum));
 
+    // Sensing a value at particle pos or next to it...
 
-	// looking for "lerper" variable, the parameter for interpolation between the parameters of the 2 Points (Pen/Background)
-	vec2 positionFromAction = normalizedPosition - normalizedActionPosition;
-	positionFromAction.x *= float(width)/height;
-	float distanceNoiseFactor = (0.9 + 0.2*noise(vec3(positionForNoise2.x,positionForNoise2.t,0.6*time))); // a bit of noise distortion on distance
-	float distanceFromAction = distance(positionFromAction,vec2(0))*distanceNoiseFactor;
-	float lerper = exp(-distanceFromAction*distanceFromAction/actionAreaSizeSigma/actionAreaSizeSigma); // use of a gaussian function: 1 at the center, 0 far from the center
-	//lerper = diffDist<=actionAreaSizeSigma ? 1 : 0;
-	//lerper = particlePos.x/width;
+    // A factor on sensed value, lerp between "pen" and "background" parameters
+    float tunedSensorScaler_1 = currentParams_1.defaultScalingFactor;
+    float tunedSensorScaler_2 = currentParams_2.defaultScalingFactor;
+    float tunedSensorScaler_mix = mix(tunedSensorScaler_1, tunedSensorScaler_2, lerper);
+    tunedSensorScaler_mix *= 1.0 + 0.3 * waveSum; // increased sense value on waves
 
+    float SensorBias1_mix = mix(currentParams_1.SensorBias1, currentParams_2.SensorBias1, lerper);
+    float SensorBias2_mix = mix(currentParams_1.SensorBias2, currentParams_2.SensorBias2, lerper);
 
-	// Section about the "trigerred waves" interaction, really a secondary feature
- 	float waveSum = 0.;
-	
-	for(int i=0;i<MAX_NUMBER_OF_WAVES;i++)
-	{
-		int maxWaveTime = 5; // in seconds
-		if((time - waveTriggerTimes[i]) <= maxWaveTime)
-		{
-			vec2 normalizedWaveCenterPosition = vec2(waveXarray[i]/width,waveYarray[i]/height);
-			vec2 relDiffWave = normalizedPosition - normalizedWaveCenterPosition;
-			relDiffWave.x *= float(width)/height;
-			float diffDistWave = distance(relDiffWave,vec2(0));
-			float noiseVariationFactor = (0.95 + 0.1*noise(vec3(positionForNoise1.x,positionForNoise1.y,0.3*time)));
-			float angleToCenter = atan(relDiffWave.y,relDiffWave.x);
-			float dir = (i%2==0) ? 1. : -1.;
+    ///////////////////////////////////////////////////////////////////////////////////
+    // Technique/formulas from Sage Jenson (mxsage)
+    float currentSensedValue = getGridValue(particlePos + SensorBias2_mix * direction + vec2(0., SensorBias1_mix)) * tunedSensorScaler_mix;
+    currentSensedValue = clamp(currentSensedValue, 0.000000001, 1.0);
+    ///////////////////////////////////////////////////////////////////////////////////
 
-			float delay = -0.1 + diffDistWave/0.3 * noiseVariationFactor + 0.4*pow(0.5 + 0.5*cos(18.*angleToCenter + 10.0*dir*diffDistWave),0.3);
-			float varWave = delay  - (time - waveTriggerTimes[i]);
-			float sigmaVariation = pow(waveSavedSigmas[i],0.75);
-			waveSum += 0.6*propagatedWaveFunction(varWave,waveSavedSigmas[i]) * max(0.,1. - 0.3*diffDistWave/sigmaVariation*noiseVariationFactor);
-		}
-	}
+    // lerp between "pen" and "background" parameters
+    float SensorDistance0_mix = mix(currentParams_1.SensorDistance0, currentParams_2.SensorDistance0, lerper);
+    float SD_amplitude_mix = mix(currentParams_1.SD_amplitude, currentParams_2.SD_amplitude, lerper);
+    float SD_exponent_mix = mix(currentParams_1.SD_exponent, currentParams_2.SD_exponent, lerper);
 
-	waveSum = 1.7*tanh(waveSum/1.7) + 0.4*tanh(4.*waveSum);
-	//lerper = mix(lerper,0.,tanh(5.*waveSum));
+    float MoveDistance0_mix = mix(currentParams_1.MoveDistance0, currentParams_2.MoveDistance0, lerper);
+    float MD_amplitude_mix = mix(currentParams_1.MD_amplitude, currentParams_2.MD_amplitude, lerper);
+    float MD_exponent_mix = mix(currentParams_1.MD_exponent, currentParams_2.MD_exponent, lerper);
 
+    float SensorAngle0_mix = mix(currentParams_1.SensorAngle0, currentParams_2.SensorAngle0, lerper);
+    float SA_amplitude_mix = mix(currentParams_1.SA_amplitude, currentParams_2.SA_amplitude, lerper);
+    float SA_exponent_mix = mix(currentParams_1.SA_exponent, currentParams_2.SA_exponent, lerper);
 
+    float RotationAngle0_mix = mix(currentParams_1.RotationAngle0, currentParams_2.RotationAngle0, lerper);
+    float RA_amplitude_mix = mix(currentParams_1.RA_amplitude, currentParams_2.RA_amplitude, lerper);
+    float RA_exponent_mix = mix(currentParams_1.RA_exponent, currentParams_2.RA_exponent, lerper);
 
-	// Sensing a value at particle pos or next to it...
+    ///////////////////////////////////////////////////////////////////////////////////
+    // Technique/formulas from Sage Jenson (mxsage)
+    // For a current sensed value S,
+    // physarum param = A + B * (S ^ C)
+    // These A,B,C parameters are part of the data of a "Point"
+    float sensorDistance = SensorDistance0_mix + SD_amplitude_mix * pow(currentSensedValue, SD_exponent_mix) * pixelScaleFactor;
+    float moveDistance = MoveDistance0_mix + MD_amplitude_mix * pow(currentSensedValue, MD_exponent_mix) * pixelScaleFactor;
+    float sensorAngle = SensorAngle0_mix + SA_amplitude_mix * pow(currentSensedValue, SA_exponent_mix);
+    float rotationAngle = RotationAngle0_mix + RA_amplitude_mix * pow(currentSensedValue, RA_exponent_mix);
+    // 3 * 4 = 12 parameters
+    ///////////////////////////////////////////////////////////////////////////////////
 
-	// A factor on sensed value, lerp between "pen" and "background" parameters
-	float tunedSensorScaler_1 = currentParams_1.defaultScalingFactor;
-	float tunedSensorScaler_2 = currentParams_2.defaultScalingFactor;
-	float tunedSensorScaler_mix = mix(tunedSensorScaler_1, tunedSensorScaler_2, lerper);
-	tunedSensorScaler_mix *= 1.0 + 0.3*waveSum; // increased sense value on waves
+    // sensing at 3 positions, as in the classic physarum algorithm
+    float sensedLeft = senseFromAngle(-sensorAngle, particlePos, heading, sensorDistance);
+    float sensedMiddle = senseFromAngle(0, particlePos, heading, sensorDistance);
+    float sensedRight = senseFromAngle(sensorAngle, particlePos, heading, sensorDistance);
 
-	float SensorBias1_mix = mix(currentParams_1.SensorBias1, currentParams_2.SensorBias1, lerper);
-	float SensorBias2_mix = mix(currentParams_1.SensorBias2, currentParams_2.SensorBias2, lerper);
+    // sensing if moving into object
+    float sensedObjectLeft = senseObjectFromAngle(-sensorAngle, particlePos, heading, sensorDistance);
+    float sensedObjectMiddle = senseObjectFromAngle(0, particlePos, heading, sensorDistance);
+    float sensedObjectRight = senseObjectFromAngle(sensorAngle, particlePos, heading, sensorDistance);
 
-	///////////////////////////////////////////////////////////////////////////////////
-	// Technique/formulas from Sage Jenson (mxsage)
-	float currentSensedValue = getGridValue(particlePos + SensorBias2_mix * direction + vec2(0.,SensorBias1_mix)) * tunedSensorScaler_mix;
-	currentSensedValue = clamp(currentSensedValue, 0.000000001, 1.0);
-	///////////////////////////////////////////////////////////////////////////////////
+    // priorising non object directions
+    float scoreLeft = sensedLeft;
+    float scoreRight = sensedRight;
+    float scoreMiddle = sensedMiddle;
+    float senseScore = 99999999;
 
+    if (sensedObjectLeft > 0) {
+        scoreLeft -= (100 + sensedObjectLeft);
+        if (sensedObjectLeft < senseScore) senseScore = sensedObjectLeft;
+    }
+    if (sensedObjectRight > 0) {
+        scoreRight -= (100 + sensedObjectRight);
+        if (sensedObjectRight < senseScore) senseScore = sensedObjectRight;
+    }
+    if (sensedObjectMiddle > 0) {
+        scoreMiddle -= (100 + sensedObjectMiddle);
+        if (sensedObjectMiddle < senseScore) senseScore = sensedObjectMiddle;
+    }
 
+    // increase velocity of particles to evade faster when in object
+    if (senseScore != 99999999) {
+        velocity += velocity * 0.15 + senseScore * 0.5;
+    }
 
-	// lerp between "pen" and "background" parameters
-	float SensorDistance0_mix = mix(currentParams_1.SensorDistance0, currentParams_2.SensorDistance0, lerper);
-	float SD_amplitude_mix = mix(currentParams_1.SD_amplitude, currentParams_2.SD_amplitude, lerper);
-	float SD_exponent_mix = mix(currentParams_1.SD_exponent, currentParams_2.SD_exponent, lerper);
+    float newHeading = heading;
+    // heading update, as in the classic physarum algorithm
+    if (scoreMiddle > scoreLeft && scoreMiddle > scoreRight)
+    {
+        ;
+    } else if (scoreMiddle < scoreLeft && scoreMiddle < scoreRight)
+    {
+        // move out directly of object if only objects
+        if (scoreMiddle < 0) {
+            newHeading = heading;
+        } else {
+            newHeading = (random(particlePos) < 0.5 ? heading - rotationAngle : heading + rotationAngle);
+        }
+    } else if (scoreRight < scoreLeft)
+    {
+        newHeading = heading - rotationAngle;
+    } else if (scoreLeft < scoreRight)
+    {
+        newHeading = heading + rotationAngle;
+    }
 
-	float MoveDistance0_mix = mix(currentParams_1.MoveDistance0, currentParams_2.MoveDistance0, lerper);
-	float MD_amplitude_mix = mix(currentParams_1.MD_amplitude, currentParams_2.MD_amplitude, lerper);
-	float MD_exponent_mix = mix(currentParams_1.MD_exponent, currentParams_2.MD_exponent, lerper);
+    // Forcing movement with joystick action,
+    // using noise to have more or less of this forced movement, because it looked too boring without
+    float noiseValue = noise(vec3(positionForNoise1.x, positionForNoise1.y, 0.8 * time));
+    float moveBiasFactor = 5 * lerper * noiseValue;
+    vec2 moveBias = moveBiasFactor * vec2(moveBiasActionX, moveBiasActionY);
 
-	float SensorAngle0_mix = mix(currentParams_1.SensorAngle0, currentParams_2.SensorAngle0, lerper);
-	float SA_amplitude_mix = mix(currentParams_1.SA_amplitude, currentParams_2.SA_amplitude, lerper);
-	float SA_exponent_mix = mix(currentParams_1.SA_exponent, currentParams_2.SA_exponent, lerper);
+    // position update of the classic physarum algorithm, but with a new move bias for fun interaction
+    float classicNewPositionX = particlePos.x + moveDistance * cos(newHeading) + moveBias.x;
+    float classicNewPositionY = particlePos.y + moveDistance * sin(newHeading) + moveBias.y;
 
-	float RotationAngle0_mix = mix(currentParams_1.RotationAngle0, currentParams_2.RotationAngle0, lerper);
-	float RA_amplitude_mix = mix(currentParams_1.RA_amplitude, currentParams_2.RA_amplitude, lerper);
-	float RA_exponent_mix = mix(currentParams_1.RA_exponent, currentParams_2.RA_exponent, lerper);
+    // inertia experimental stuff... actually it's a lot weirder than just modifying speed instead of position
+    // probably the weirdest stuff in the code of this project
+    velocity *= 0.98;
+    float vf = 1.0;
+    float velocityBias = 0.2 * L2Action;
+    float vx = velocity.x + vf * cos(newHeading) + velocityBias * moveBias.x;
+    float vy = velocity.y + vf * sin(newHeading) + velocityBias * moveBias.y;
 
+    //float dt = 0.05*moveDistance;
+    float dt = 0.07 * pow(moveDistance, 1.4); // really weird thing, I thought this looked satisfying
 
-	///////////////////////////////////////////////////////////////////////////////////
-	// Technique/formulas from Sage Jenson (mxsage)
-	// For a current sensed value S,
-	// physarum param = A + B * (S ^ C)
-	// These A,B,C parameters are part of the data of a "Point"
-	float sensorDistance = SensorDistance0_mix + SD_amplitude_mix * pow(currentSensedValue, SD_exponent_mix) * pixelScaleFactor;
-	float moveDistance = MoveDistance0_mix + MD_amplitude_mix * pow(currentSensedValue, MD_exponent_mix) * pixelScaleFactor;
-	float sensorAngle = SensorAngle0_mix + SA_amplitude_mix * pow(currentSensedValue, SA_exponent_mix);
-	float rotationAngle = RotationAngle0_mix + RA_amplitude_mix * pow(currentSensedValue, RA_exponent_mix);
-	// 3 * 4 = 12 parameters
-	///////////////////////////////////////////////////////////////////////////////////
-	
+    float inertiaNewPositionX = particlePos.x + dt * vx + moveBias.x;
+    float inertiaNewPositionY = particlePos.y + dt * vy + moveBias.y;
 
-	// sensing at 3 positions, as in the classic physarum algorithm
-	float sensedLeft = senseFromAngle(-sensorAngle, particlePos, heading, sensorDistance);
-	float sensedMiddle = senseFromAngle(0, particlePos, heading, sensorDistance);
-	float sensedRight = senseFromAngle(sensorAngle, particlePos, heading, sensorDistance);
+    float moveStyleLerper = 0.6 * L2Action + 0.8 * waveSum; // intensity of use of inertia
+    // the new position of the particle:
+    float px = mix(classicNewPositionX, inertiaNewPositionX, moveStyleLerper);
+    float py = mix(classicNewPositionY, inertiaNewPositionY, moveStyleLerper);
 
+    //for(int i=0; i< )
 
+    // possibility of spawn to other position if spawning action is triggered
+    if (spawnParticles >= 1)
+    {
+        float randForChoice = gn(particlePos * 53.146515 / width, 13.955475); // uniform random in [0,1]
 
-	float newHeading = heading;
-	// heading update, as in the classic physarum algorithm
-	if(sensedMiddle > sensedLeft && sensedMiddle > sensedRight)
-	{
-		;
-	} else if(sensedMiddle < sensedLeft && sensedMiddle < sensedRight)
-	{
-		newHeading = (random(particlePos)< 0.5 ? heading - rotationAngle : heading + rotationAngle);
-	} else if(sensedRight < sensedLeft)
-	{
-		newHeading = heading - rotationAngle;
-	} else if(sensedLeft < sensedRight)
-	{
-		newHeading = heading + rotationAngle;
-	}
+        if (randForChoice < spawnFraction) // probability spawnFraction to spawn
+        {
+            float randForRadius = gn(particlePos * 22.698515 / width, 33.265475);
 
+            if (spawnParticles == 1) // circular spawn
+            {
+                float randForTheta = gn(particlePos * 8.129515 / width, 17.622475);
+                float theta = randForTheta * PI * 2.0;
+                float r1 = actionAreaSizeSigma * 0.25 * (0.95 + 0.1 * randForRadius);
+                //float r1 = actionAreaSizeSigma * 0.55 * (0.95 + 0.1*randForRadius);
+                float sx = r1 * cos(theta);
+                float sy = r1 * sin(theta);
+                vec2 spos = vec2(sx, sy);
+                spos *= height;
+                px = curActionX + spos.x;
+                py = curActionY + spos.y;
+            }
+            if (spawnParticles == 2) // spawn at few places near pen
+            {
+                int randForSpawnIndex = int(floor(randomSpawnNumber * gn(particlePos * 28.218515 / width, 35.435475)));
+                float sx = randomSpawnXarray[randForSpawnIndex];
+                float sy = randomSpawnYarray[randForSpawnIndex];
+                vec2 spos = 0.35 * actionAreaSizeSigma * vec2(sx, sy) * (0.9 + 0.1 * randForRadius);
+                //vec2 spos = 0.65 * actionAreaSizeSigma * vec2(sx,sy) * (0.9 + 0.1*randForRadius);
+                spos *= height;
+                px = curActionX + spos.x;
+                py = curActionY + spos.y;
+            }
+        }
+    }
 
+    // just position loop to keep pixel positions of the simulation canvas
+    vec2 nextPos = vec2(mod(px + float(width), float(width)), mod(py + float(height), float(height)));
 
-	// Forcing movement with joystick action,
-	// using noise to have more or less of this forced movement, because it looked too boring without
-	float noiseValue = noise(vec3(positionForNoise1.x,positionForNoise1.y,0.8*time));
-	float moveBiasFactor = 5 * lerper * noiseValue;
-	vec2 moveBias = moveBiasFactor * vec2(moveBiasActionX,moveBiasActionY);
+    uint depositAmount = uint(1); // all particles add 1 on pixel count, could be more complex one day maybe
+    // atomicAdd for increasing counter at pixel, in parallel computation
+    atomicAdd(particlesCounter[int(round(nextPos.x)) * height + int(round(nextPos.y))], depositAmount);
 
+    ///////////////////////////////////////////////////////////////////////////////////
+    // Technique/formula from Sage Jenson (mxsage)
+    // particles are regularly respawning, their progression is stored in particle data
+    const float reinitSegment = 0.0010; // respawn every 1/reinitSegment iterations
+    float curA = currAHeading.x;
+    if (curA < reinitSegment)
+    {
+        nextPos = getRandomPos(particlePos);
+    }
+    float nextA = fract(curA + reinitSegment);
+    ///////////////////////////////////////////////////////////////////////////////////
 
-	// position update of the classic physarum algorithm, but with a new move bias for fun interaction
-	float classicNewPositionX = particlePos.x + moveDistance*cos(newHeading) + moveBias.x;
-	float classicNewPositionY = particlePos.y + moveDistance*sin(newHeading) + moveBias.y;
-	
-	// inertia experimental stuff... actually it's a lot weirder than just modifying speed instead of position
-	// probably the weirdest stuff in the code of this project
-	velocity *= 0.98;
-	float vf = 1.0;
-	float velocityBias = 0.2*L2Action;
-	float vx = velocity.x + vf*cos(newHeading) + velocityBias*moveBias.x;
-	float vy = velocity.y + vf*sin(newHeading) + velocityBias*moveBias.y;
-
-	//float dt = 0.05*moveDistance;
-	float dt = 0.07*pow(moveDistance,1.4); // really weird thing, I thought this looked satisfying
-
-	float inertiaNewPositionX = particlePos.x + dt*vx + moveBias.x;
-	float inertiaNewPositionY = particlePos.y + dt*vy + moveBias.y;
-
-
-	float moveStyleLerper = 0.6*L2Action + 0.8*waveSum; // intensity of use of inertia
-	// the new position of the particle:
-	float px = mix(classicNewPositionX, inertiaNewPositionX, moveStyleLerper);
-	float py = mix(classicNewPositionY, inertiaNewPositionY, moveStyleLerper);
-
-	//for(int i=0; i< )
-	
-
-
-	// possibility of spawn to other position if spawning action is triggered
-	if(spawnParticles >= 1)
-	{
-		float randForChoice = gn(particlePos*53.146515/width,13.955475); // uniform random in [0,1]
-
-		if(randForChoice < spawnFraction) // probability spawnFraction to spawn
-		{
-			float randForRadius = gn(particlePos*22.698515/width,33.265475);
-
-			if(spawnParticles == 1) // circular spawn
-			{
-				float randForTheta = gn(particlePos*8.129515/width,17.622475);
-				float theta = randForTheta * PI * 2.0;
-				float r1 = actionAreaSizeSigma * 0.25 * (0.95 + 0.1*randForRadius);
-				//float r1 = actionAreaSizeSigma * 0.55 * (0.95 + 0.1*randForRadius);
-				float sx = r1*cos(theta);
-				float sy = r1*sin(theta);
-				vec2 spos = vec2(sx,sy);
-				spos *= height;
-				px = curActionX + spos.x;
-				py = curActionY + spos.y;
-			}
-			if(spawnParticles == 2) // spawn at few places near pen
-			{
-				int randForSpawnIndex = int(floor(randomSpawnNumber * gn(particlePos*28.218515/width,35.435475)));
-				float sx = randomSpawnXarray[randForSpawnIndex];
-				float sy = randomSpawnYarray[randForSpawnIndex];
-				vec2 spos = 0.35 * actionAreaSizeSigma * vec2(sx,sy) * (0.9 + 0.1*randForRadius);
-				//vec2 spos = 0.65 * actionAreaSizeSigma * vec2(sx,sy) * (0.9 + 0.1*randForRadius);
-				spos *= height;
-				px = curActionX + spos.x;
-				py = curActionY + spos.y;
-			}
-		}
-	}
-
-
-	// just position loop to keep pixel positions of the simulation canvas
-	vec2 nextPos = vec2(mod(px + float(width),float(width)),mod(py + float(height),float(height)));
-	
-	uint depositAmount = uint(1); // all particles add 1 on pixel count, could be more complex one day maybe
-	// atomicAdd for increasing counter at pixel, in parallel computation
-	atomicAdd(particlesCounter[int(round(nextPos.x))*height + int(round(nextPos.y))], depositAmount);
-
-	///////////////////////////////////////////////////////////////////////////////////
-	// Technique/formula from Sage Jenson (mxsage)
-	// particles are regularly respawning, their progression is stored in particle data
-	const float reinitSegment=0.0010; // respawn every 1/reinitSegment iterations
-	float curA = currAHeading.x;
-	if (curA < reinitSegment)
-	{
-		nextPos = getRandomPos(particlePos);
-	}
-	float nextA = fract(curA+reinitSegment);
-	///////////////////////////////////////////////////////////////////////////////////
-
-	vec2 nextPosUV = mod(nextPos, vec2(width, height)) / vec2(width, height);
+    vec2 nextPosUV = mod(nextPos, vec2(width, height)) / vec2(width, height);
     float newHeadingNorm = mod(newHeading, 2.0 * PI) / (2.0 * PI);
     vec2 nextAandHeading = vec2(nextA, fract(newHeadingNorm));
 
-	// update particle data
-	particlesArray[3 * gl_GlobalInvocationID.x] = packUnorm2x16(nextPosUV);
-	particlesArray[3 * gl_GlobalInvocationID.x + 1] = packUnorm2x16(nextAandHeading);
-	particlesArray[3 * gl_GlobalInvocationID.x + 2] = packHalf2x16(vec2(vx, vy));
+    // added move straight if everything is 0
+    if (sensedMiddle == 0.0) {
+        nextAandHeading = currAHeading;
+    }
+
+    // update particle data
+    particlesArray[3 * gl_GlobalInvocationID.x] = packUnorm2x16(nextPosUV);
+    particlesArray[3 * gl_GlobalInvocationID.x + 1] = packUnorm2x16(nextAandHeading);
+    particlesArray[3 * gl_GlobalInvocationID.x + 2] = packHalf2x16(vec2(vx, vy));
 }

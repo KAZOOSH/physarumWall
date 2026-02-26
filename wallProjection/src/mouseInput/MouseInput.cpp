@@ -15,6 +15,7 @@ void MouseInput::setup(ofJson settings)
     ofAddListener(ofEvents().mouseDragged, this, &MouseInput::mouseMoved);
     ofAddListener(ofEvents().mouseReleased, this, &MouseInput::mouseReleased);
     ofAddListener(ofEvents().keyPressed, this, &MouseInput::keyPressed);
+    ofAddListener(ofEvents().mouseScrolled, this, &MouseInput::mouseScrolled);
 
     auto dim = settings["screens"].back()["worldDimensions"];
     dimensions.x = dim["x"].get<int>() + dim["width"].get<int>();
@@ -31,6 +32,8 @@ void MouseInput::mousePressed(ofMouseEventArgs &args)
 {
     ofTouchEventArgs t = ofTouchEventArgs(ofTouchEventArgs::down, ofMap(args.x, 0, screen.x, 0, dimensions.x, true),
                                           ofMap(args.y, 0, screen.y, 0, dimensions.y, true), currentId);
+    t.width = rTouch;
+    t.height = rTouch;
 
     interactionStart.notify(t);
     updateTexture(args);
@@ -49,6 +52,8 @@ void MouseInput::mouseMoved(ofMouseEventArgs &args)
 
     ofTouchEventArgs t = ofTouchEventArgs(ofTouchEventArgs::move, ofMap(args.x, 0, screen.x, 0, dimensions.x, true),
                                           ofMap(args.y, 0, screen.y, 0, dimensions.y, true), currentId);
+    t.width = rTouch;
+    t.height = rTouch;
     interactionMove.notify(t);
     updateTexture(args);
 }
@@ -72,6 +77,16 @@ void MouseInput::keyPressed(ofKeyEventArgs &args)
     default:
         break;
     }
+}
+
+void MouseInput::addWindow(shared_ptr<ofAppBaseWindow> window)
+{
+    ofAddListener(window->events().mouseScrolled, this, &MouseInput::mouseScrolled);
+}
+
+void MouseInput::mouseScrolled(ofMouseEventArgs &args)
+{
+    rTouch = std::max(1, rTouch + (int)args.scrollY*3);
 }
 
 void MouseInput::updateTexture(ofMouseEventArgs &args)

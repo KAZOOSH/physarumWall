@@ -14,11 +14,16 @@
   "lsp": {
     "clangd": {
       "binary": {
+        "path": "/usr/bin/clangd",
         "arguments": [
           "--background-index",
+          "--background-index-priority=low",
           "--clang-tidy=false",
           "--header-insertion=never",
-          "--completion-style=detailed"
+          "--completion-style=detailed",
+          "--pch-storage=memory",
+          "--limit-references=500",
+          "--limit-results=100"
         ]
       }
     }

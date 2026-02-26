@@ -52,6 +52,7 @@ void ofApp::setup() {
 
 	mouseInput = shared_ptr<MouseInput>(new MouseInput());
 	mouseInput->setup(settings);
+	for (auto & win : extraWindows) mouseInput->addWindow(win);
 
 	controller = shared_ptr<LidarController>(new LidarController());
 	controller->setup(settings);
@@ -85,7 +86,7 @@ void ofApp::update() {
 				screen["textureSize"][0].get<int>(),
 				screen["textureSize"][1].get<int>()
 			);
-			streamManager.update(textureCreation->getTexture(), srcRect);
+			streamManager.update(textureCreation->getDebugTexture("trailMap"), srcRect);
 		}
 	}
 
@@ -121,12 +122,13 @@ void ofApp::drawWindow(int screenId, ofEventArgs & args) {
 }
 
 void ofApp::drawDebugWindow(ofEventArgs& args) {
+	float column1width = 0.7;
 	ofBackground(0);
 	auto t = textureCreation->getTexture();
 	auto s = t.getSize();
 
 	auto win = ofGetCurrentWindow();
-    float w = win->getWidth() -400;
+    float w = win->getWidth()*column1width;
     float h = win->getHeight();
 
     float scale = min(w / s.x, h / s.y);
@@ -157,9 +159,45 @@ void ofApp::drawDebugWindow(ofEventArgs& args) {
 
         ofSetColor(255);
         string label = screen.value("id", "") + " [" + screen.value("screenType", "") + "]";
-        ofDrawBitmapStringHighlight(label, rx + 4, ry + 14);
+        ofDrawBitmapStringHighlight(label, rx + 5, ry + 15);
     }
     ofPopStyle();
+
+    auto tInput = textureCreation->getObjectsFbo();
+	s = tInput.getSize();
+
+    w = win->getWidth()*(1.0-column1width-0.05);
+    h = win->getHeight();
+    scale = min(w / s.x, h / s.y);
+
+    drawW = s.x * scale;
+    drawH = s.y * scale;
+
+    ofPushMatrix();
+    // objects
+    ofTranslate(win->getWidth()*(column1width+0.05)-2,0);
+    ofDrawRectangle(0, 0, drawW+2, drawH+2);
+    tInput.draw(1, 1, drawW, drawH);
+    ofDrawBitmapStringHighlight("objects", 5,15);
+
+    // distance
+    ofTranslate(0,drawH +15);
+    ofDrawRectangle(0, 0, drawW+2, drawH+2);
+    textureCreation->getDebugTexture("distanceField").draw(1, 1, drawW, drawH);
+    ofDrawBitmapStringHighlight("distanceField", 5,15);
+
+    // trail
+    ofTranslate(0,drawH +15);
+    ofDrawRectangle(0, 0, drawW+2, drawH+2);
+    textureCreation->getDebugTexture("trailMap").draw(1, 1, drawW, drawH);
+    ofDrawBitmapStringHighlight("trailMap", 5,15);
+
+
+
+    ofPopMatrix();
+
+
+
 
 }
 
@@ -286,6 +324,9 @@ void ofApp::processKeyPressedEvent(int key, int screenId) {
 	}
 	if (key == 'r') {
 		settings = ofLoadJson("settings.json");
+	}
+	if (key == 'R') {
+		textureCreation->reloadShaders();
 	}
 	if (key == 'f') {
 		ofToggleFullscreen();

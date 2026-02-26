@@ -1,6 +1,7 @@
 {
   "debug": {
-    "debugScreen": true
+    "debugScreen": true,
+    "position": [1920, 10]
   },
   "lidars": [
     {
