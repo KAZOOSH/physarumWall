@@ -11,7 +11,8 @@ public:
     MouseInput();
     ~MouseInput();
     void setup(ofJson settings) override;
-    
+    void addWindow(shared_ptr<ofAppBaseWindow> window);
+
 
 
     void mousePressed(ofMouseEventArgs &args);
@@ -20,12 +21,15 @@ public:
 
     void keyPressed(ofKeyEventArgs &args);
 
+    void mouseScrolled(ofMouseEventArgs &args);
     void updateTexture(ofMouseEventArgs &args);
 
 private:
     int currentId = 0;
     glm::vec2 dimensions;
     glm::vec2 screen;
+
+    int rTouch = 50;
 };
 
 #endif

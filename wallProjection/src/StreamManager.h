@@ -10,13 +10,13 @@ class StreamManager {
 public:
     void setup(const ofJson& settings);
 
-    void update(ofTexture& texture);
+    void update(ofTexture& texture, ofRectangle srcRect = ofRectangle());
 
-    void start(ofTexture& texture);
+    void start(ofTexture& texture, ofRectangle srcRect = ofRectangle());
     void stop();
 
     bool streaming() const { return isStreaming; }
-    void toggle(ofTexture& texture);
+    void toggle(ofTexture& texture, ofRectangle srcRect = ofRectangle());
 
 private:
     void worker();
@@ -24,6 +24,7 @@ private:
     bool isStreaming = false;
     FILE* ffmpegPipe = nullptr;
 
+    ofFbo cropFbo;
     ofPixels streamPixels;
     std::mutex streamMutex;
     std::condition_variable streamCv;

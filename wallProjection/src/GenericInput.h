@@ -9,7 +9,7 @@
 #include "ofFbo.h"
 #include "ofxOsc.h"
 
-#define MAX_HEIGHT 2200 // max interaction height of screen 
+#define MAX_HEIGHT 2200 // max interaction height of screen
 
 class GenericInput
 {
@@ -29,7 +29,7 @@ public:
 
     ofEvent<ofxOscMessage> newOscEvent;
 protected:
-   
+
 
     ofJson settings;
     ofFbo debugFbo;

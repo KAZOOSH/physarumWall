@@ -20,6 +20,8 @@ public:
     virtual void update() = 0;
     virtual void draw() = 0;
     ofTexture& getTexture();
+    ofTexture& getObjectsFbo();
+    virtual ofTexture& getDebugTexture(string id);
 
     void registerInputs(shared_ptr<GenericInput> input);
 
@@ -34,8 +36,9 @@ public:
     void saveTextureToFile(string filename);
 
 protected:
-    ofFbo fbo;
-    
+    ofFbo outputFbo;
+    ofFbo objectsFbo;
+
 };
 
 #endif

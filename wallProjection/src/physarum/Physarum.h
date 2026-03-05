@@ -38,6 +38,8 @@ public:
     void update();
     void draw();
 
+    ofTexture& getDebugTexture(string id) override;
+
     void onTouchDown(ofTouchEventArgs& ev) override;
     void onTouchUp(ofTouchEventArgs& ev) override;
     void onTouchMove(ofTouchEventArgs& ev) override;
@@ -46,6 +48,7 @@ public:
 
     void changeScenario();
     void sendChangeScenario();
+    void reloadShaders();
 
     PointsDataManager pointsDataManager; // loading initial stuff with PointsDataManager::PointsDataManager()
     void paramsUpdate();
@@ -116,6 +119,12 @@ public:
     ofFbo trailReadBuffer,trailWriteBuffer,fboDisplay;
     ofShader setterShader,moveShader,depositShader,blurShader;
 
+    ofFbo jfaFboA, jfaFboB, distanceFbo;
+    ofShader jfaInitShader, jfaShader, jfaDistShader;
+
+    ofFbo trailMapFbo;
+    ofShader trailMapShader;
+
     std::vector<uint32_t> counter;
     ofBufferObject counterBuffer;
     std::vector<PointSettings> simulationParameters;
@@ -130,7 +139,6 @@ public:
     void updateInputs(ofTouchEventArgs& t);
     void remapTouchPosition(ofTouchEventArgs& t);
 
-    int numberOfGamepads;
 
     ofTrueTypeFont myFont, myFontBold;
 
@@ -153,7 +161,7 @@ public:
 
     vector<std::string> parameterNames;
 
-    
+
 
 
 

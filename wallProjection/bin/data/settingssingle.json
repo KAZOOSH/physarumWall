@@ -28,22 +28,22 @@
       "x": {
         "center": [
           {
-            "channel": 2,
-            "max": 0.2,
+            "channel": 1,
+            "max": 0.33,
             "min": 0.0,
-            "note": [60, 72]
+            "note": [10, 60]
           },
           {
             "channel": 0,
-            "max": 0.8,
-            "min": 0.2,
+            "max": 0.7,
+            "min": 0.33,
             "note": [48, 72]
           },
           {
             "channel": 2,
             "max": 1.0,
-            "min": 0.8,
-            "note": [72, 84]
+            "min": 0.7,
+            "note": [60, 84]
           }
         ]
       },
@@ -83,46 +83,8 @@
     "0": {
       "dst": [
         {
-          "x": 0.0,
-          "y": 0.0
-        },
-        {
-          "x": 1920.0,
-          "y": 0.0
-        },
-        {
-          "x": 1920.0,
-          "y": 1200.0
-        },
-        {
-          "x": 0.0,
-          "y": 1200.0
-        }
-      ],
-      "src": [
-        {
-          "x": 0.0,
-          "y": 0.0
-        },
-        {
-          "x": 1920.0,
-          "y": 0.0
-        },
-        {
-          "x": 1920.0,
-          "y": 1200.0
-        },
-        {
-          "x": 0.0,
-          "y": 1200.0
-        }
-      ]
-    },
-    "1": {
-      "dst": [
-        {
-          "x": 0.0,
-          "y": 0.0
+          "x": 1.0,
+          "y": 3.0
         },
         {
           "x": 1920.0,
@@ -159,28 +121,13 @@
   },
   "screens": [
     {
-      "id": "top",
-      "position": [0, 0],
+      "id": "center",
+      "position": [1920, 0],
       "quad": "0",
       "screenType": "screen",
-      "size": [1920, 1080],
+      "size": [1920, 1200],
       "texturePosition": [0, 0],
-      "textureSize": [1920, 1080],
-      "worldDimensions": {
-        "height": 3320,
-        "width": 5460,
-        "x": 0,
-        "y": 3320
-      }
-    },
-    {
-      "id": "bottom",
-      "position": [0, 0],
-      "quad": "0",
-      "screenType": "screen",
-      "size": [1920, 1080],
-      "texturePosition": [0, 1080],
-      "textureSize": [1920, 1080],
+      "textureSize": [1920, 1200],
       "worldDimensions": {
         "height": 3320,
         "width": 5460,

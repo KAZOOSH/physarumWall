@@ -138,49 +138,11 @@
                     "y": 1200.0
                 }
             ]
-        },
-        "1": {
-            "dst": [
-                {
-                    "x": 1.0,
-                    "y": 3.0
-                },
-                {
-                    "x": 1920.0,
-                    "y": 0.0
-                },
-                {
-                    "x": 1920.0,
-                    "y": 1200.0
-                },
-                {
-                    "x": 0.0,
-                    "y": 1200.0
-                }
-            ],
-            "src": [
-                {
-                    "x": 0.0,
-                    "y": 0.0
-                },
-                {
-                    "x": 1920.0,
-                    "y": 0.0
-                },
-                {
-                    "x": 1920.0,
-                    "y": 1200.0
-                },
-                {
-                    "x": 0.0,
-                    "y": 1200.0
-                }
-            ]
         }
     },
     "screens": [
         {
-            "fullscreen": true,
+            "fullscreen": false,
             "id": "top",
             "monitor": 1,
             "quad": "0",
@@ -192,31 +154,6 @@
             "texturePosition": [
                 0,
                 0
-            ],
-            "textureSize": [
-                1920,
-                1080
-            ],
-            "worldDimensions": {
-                "height": 3320,
-                "width": 5460,
-                "x": 0,
-                "y": 3320
-            }
-        },
-        {
-            "fullscreen": false,
-            "id": "bottom",
-            "monitor": 1,
-            "quad": "1",
-            "screenType": "stream",
-            "size": [
-                1920,
-                1080
-            ],
-            "texturePosition": [
-                0,
-                1080
             ],
             "textureSize": [
                 1920,
