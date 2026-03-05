@@ -6,6 +6,11 @@
 #include <csignal>
 #endif
 
+#ifdef _WIN32
+#include <io.h>
+#include <fcntl.h>
+#endif
+
 void StreamManager::setup(const ofJson& settings) {
     if (settings.contains("streaming")) {
         auto& sc = settings["streaming"];
@@ -77,8 +82,16 @@ void StreamManager::start(ofTexture& texture, ofRectangle srcRect) {
         ? " -f flv"
         : " -rtsp_transport tcp -f rtsp";
 
+#ifdef _WIN32
+    const std::string ffmpegBin   = "ffmpeg";
+    const std::string logRedirect = " 2>NUL";
+#else
+    const std::string ffmpegBin   = "/usr/bin/ffmpeg";
+    const std::string logRedirect = " 2>/tmp/ffmpeg_stream.log";
+#endif
+
     std::string cmd =
-        "/usr/bin/ffmpeg -y"
+        ffmpegBin + " -y"
         " -f rawvideo -pix_fmt rgba"
         " -s " + ofToString(streamWidth) + "x" + ofToString(streamHeight) +
         " -r " + ofToString(streamFps) +
@@ -89,7 +102,7 @@ void StreamManager::start(ofTexture& texture, ofRectangle srcRect) {
         " -g " + ofToString(streamFps) +
         " -b:v " + streamBitrate +
         outputFlags + " " + streamUrl +
-        " 2>/tmp/ffmpeg_stream.log";
+        logRedirect;
 
 #ifdef __linux__
     {
@@ -111,8 +124,15 @@ void StreamManager::start(ofTexture& texture, ofRectangle srcRect) {
 #endif
 
     ofLogNotice("StreamManager") << "FFmpeg cmd: " << cmd;
+#ifndef _WIN32
     signal(SIGPIPE, SIG_IGN);
+#endif
+#ifdef _WIN32
+    ffmpegPipe = _popen(cmd.c_str(), "wb");
+    if (ffmpegPipe) _setmode(_fileno(ffmpegPipe), _O_BINARY);
+#else
     ffmpegPipe = popen(cmd.c_str(), "w");
+#endif
     if (!ffmpegPipe) {
         ofLogError("StreamManager") << "Failed to open FFmpeg pipe: " << cmd;
         return;
@@ -131,7 +151,11 @@ void StreamManager::stop() {
     streamRunning = false;
     streamCv.notify_all();
     if (streamThread.joinable()) streamThread.join();
+#ifdef _WIN32
+    if (ffmpegPipe) { _pclose(ffmpegPipe); ffmpegPipe = nullptr; }
+#else
     if (ffmpegPipe) { pclose(ffmpegPipe); ffmpegPipe = nullptr; }
+#endif
     ofLogNotice("StreamManager") << "Streaming stopped";
 }
 

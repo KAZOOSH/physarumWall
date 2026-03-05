@@ -4,6 +4,7 @@
 #pragma once
 
 #include <atomic>
+#include <cstdint>
 #include <set>
 #include <queue>
 #include "ofMathConstants.h"
@@ -33,16 +34,16 @@ class Cluster
 {
 public:
     float radius;
-    u_int64_t meanAngle;
-    u_int64_t meanDist;
+    uint64_t meanAngle;
+    uint64_t meanDist;
     std::map<int, LidarRawSample> samples;
 };
 
 class TrackingPoint
 {
 public:
-    u_int64_t oldId;
-    u_int64_t newId;
+    uint64_t oldId;
+    uint64_t newId;
     float dist;
 };
 
@@ -113,7 +114,7 @@ private:
     ofxUDPManager udpReceiver;
 
     //
-    u_int64_t tScanStarted = 0;
+    uint64_t tScanStarted = 0;
     bool isScanningEnvironment = false;
     bool newFrame;
 

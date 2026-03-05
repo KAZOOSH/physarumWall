@@ -39,7 +39,7 @@ void Ms200Receiver::setup(ofJson settings)
             {
                 auto angleIndex = ofToInt(parts[0]);
                 auto angle = static_cast<uint16_t>(ofToInt(parts[1]));
-                auto dist = static_cast<u_int32_t>(ofToInt(parts[2]));
+                auto dist = static_cast<uint32_t>(ofToInt(parts[2]));
                 auto quality = static_cast<int8_t>(ofToInt(parts[3]));
                 environment.insert(make_pair(angleIndex,
                                              LidarRawSample{angle, dist, quality}));
@@ -161,7 +161,7 @@ void Ms200Receiver::threadedFunction()
         
 
         // read message
-        int lMsg = 4096;
+        constexpr int lMsg = 4096;
         char udpMessage[lMsg];
         memset(udpMessage, -127, sizeof(udpMessage));
         udpReceiver.Receive(udpMessage, lMsg);
