@@ -209,7 +209,7 @@ void Physarum::update(){
     {
         spawn[i] = 0;
     }*/
-    
+
 
     std::stringstream strm;
     strm << "fps: " << ofGetFrameRate();
@@ -280,9 +280,9 @@ void Physarum::updateInputs(ofTouchEventArgs& t)
 {
     // Create a vector from the map entries
     std::vector<std::pair<int, std::tuple<long, ofTouchEventArgs>>> vec(touches.begin(), touches.end());
-    
+
     // Sort the vector by the long value in descending order (largest first)
-    std::sort(vec.begin(), vec.end(), 
+    std::sort(vec.begin(), vec.end(),
               [](const auto& a, const auto& b) {
                   return std::get<0>(a.second) > std::get<0>(b.second);
               });
@@ -327,17 +327,13 @@ void Physarum::onTouchDown(ofTouchEventArgs &ev)
    // coudt << ev.x << " : " << ev.y;
 
     remapTouchPosition(ev);
-<<<<<<< HEAD
-    std::tuple<long,ofTouchEventArgs> t {ofGetElapsedTimeMillis(),ev};
-=======
     tuple<long,ofTouchEventArgs> t {ofGetElapsedTimeMillis(),ev};
->>>>>>> parent of 96f0499 (live parameter change added via /live)
     touches[ev.id] = t;
 
    // cout << "   ->   " << ev.x << " : " << ev.y <<endl;
-    
+
     updateInputs(ev);
-    
+
     //curActionX = ofMap(ev.x, 0, ofGetWidth(), 0, simulationWidth, true);
     //curActionY = ofMap(ev.y, 0, ofGetHeight(), 0, simulationHeight, true);
 
@@ -355,19 +351,15 @@ void Physarum::onTouchUp(ofTouchEventArgs &ev)
         cout << touch.first << "  " << get<0>(touch.second) <<endl;
     }
     cout << endl;*/
-    
-    
+
+
 }
 
 void Physarum::onTouchMove(ofTouchEventArgs &ev)
 {
    // cout << ev.x << " , " <<ev.y <<endl;
     remapTouchPosition(ev);
-<<<<<<< HEAD
-    std::tuple<long,ofTouchEventArgs> t {ofGetElapsedTimeMillis(),ev};
-=======
     tuple<long,ofTouchEventArgs> t {ofGetElapsedTimeMillis(),ev};
->>>>>>> parent of 96f0499 (live parameter change added via /live)
     touches[ev.id] = t;
 
 
@@ -435,12 +427,9 @@ void Physarum::changeScenario()
         pointsDataManager.currentSelectionIndex = 0;
         actionChangeParams(1);
         sendChangeScenario();
-<<<<<<< HEAD
 
     }
-=======
-    } 
->>>>>>> parent of 96f0499 (live parameter change added via /live)
+
     // lastFG
     else if(nextAction <8){
         pointsDataManager.currentSelectionIndex = 1;
@@ -455,7 +444,6 @@ void Physarum::changeScenario()
 }
 
 void Physarum::sendChangeScenario()
-<<<<<<< HEAD
 {
 
     // midi messages
@@ -508,8 +496,6 @@ void Physarum::sendChangeScenario()
     ofNotifyEvent(newOscEvent, s1, this);
 
 
-
-=======
 {            ofxOscMessage m;
             m.setAddress("/midi/cc");
             m.addIntArg(pointsDataManager.selectedIndices[pointsDataManager.getSelectionIndex()]+1);
@@ -537,6 +523,5 @@ void Physarum::sendChangeScenario()
             m4.addIntArg(pointsDataManager.selectedIndices[pointsDataManager.getSelectionIndex()]);
             m4.addIntArg(2);
             ofNotifyEvent(newOscMessageEvent,m4,this);
-        
->>>>>>> parent of 96f0499 (live parameter change added via /live)
+
 }
