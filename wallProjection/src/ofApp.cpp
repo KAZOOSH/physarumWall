@@ -122,7 +122,7 @@ void ofApp::drawWindow(int screenId, ofEventArgs & args) {
 }
 
 void ofApp::drawDebugWindow(ofEventArgs& args) {
-	float column1width = 0.7;
+	float column1width = 0.6;
 	ofBackground(0);
 	auto t = textureCreation->getTexture();
 	auto s = t.getSize();
@@ -136,6 +136,7 @@ void ofApp::drawDebugWindow(ofEventArgs& args) {
     float drawW = s.x * scale;
     float drawH = s.y * scale;
 
+    column1width = drawW;
     t.draw(0, 0, drawW, drawH);
 
     ofPushStyle();
@@ -166,7 +167,7 @@ void ofApp::drawDebugWindow(ofEventArgs& args) {
     auto tInput = textureCreation->getObjectsFbo();
 	s = tInput.getSize();
 
-    w = win->getWidth()*(1.0-column1width-0.05);
+    w = (win->getWidth()- column1width)*0.95*0.5;
     h = win->getHeight();
     scale = min(w / s.x, h / s.y);
 
@@ -175,16 +176,18 @@ void ofApp::drawDebugWindow(ofEventArgs& args) {
 
     ofPushMatrix();
     // objects
-    ofTranslate(win->getWidth()*(column1width+0.05)-2,0);
+    ofTranslate(column1width+10+2,0);
     ofDrawRectangle(0, 0, drawW+2, drawH+2);
     tInput.draw(1, 1, drawW, drawH);
     ofDrawBitmapStringHighlight("objects", 5,15);
 
+    ofPushMatrix();
     // distance
-    ofTranslate(0,drawH +15);
+    ofTranslate(drawW+15,0);
     ofDrawRectangle(0, 0, drawW+2, drawH+2);
     textureCreation->getDebugTexture("distanceField").draw(1, 1, drawW, drawH);
     ofDrawBitmapStringHighlight("distanceField", 5,15);
+    ofPopMatrix();
 
     // trail
     ofTranslate(0,drawH +15);

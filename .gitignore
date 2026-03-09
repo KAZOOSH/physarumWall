@@ -1,4 +1,6 @@
-
+wallProjection/.claude/*
+wallProjection/.zed/*
+wallProjection/.clangd
 *.user
 *.vcxproj
 *.sln
