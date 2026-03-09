@@ -3,6 +3,11 @@
         "debugScreen": true,
         "monitor": 0
     },
+    "streaming": {
+        "url": "rtsp://127.0.0.1:8554/live",
+        "encoder": "h264_nvenc",
+        "bitrate": "10M"
+    },
     "lidars": [
         {
             "environmentFile": "env_left.txt",
@@ -104,8 +109,8 @@
         "0": {
             "dst": [
                 {
-                    "x": 1.0,
-                    "y": 3.0
+                    "x": 0.0,
+                    "y": 0.0
                 },
                 {
                     "x": 1920.0,
