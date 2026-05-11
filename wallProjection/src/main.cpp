@@ -4,6 +4,13 @@
 
 int main()
 {
+	// When running as an AppImage, OF would resolve data/ relative to the binary
+	// inside the read-only mount. OF_DATA_PATH overrides this to point at the
+	// extracted, editable data/ folder placed next to the .AppImage file.
+	if (const char* dataPath = std::getenv("OF_DATA_PATH")) {
+		ofSetDataPathRoot(dataPath);
+	}
+
 	ofJson jSettings = ofLoadJson("settings.json")["screens"];
 
 	// creates windows, up to 4 supported
