@@ -327,7 +327,7 @@ void Physarum::onTouchDown(ofTouchEventArgs &ev)
    // coudt << ev.x << " : " << ev.y;
 
     remapTouchPosition(ev);
-    tuple<long,ofTouchEventArgs> t {ofGetElapsedTimeMillis(),ev};
+    std::tuple<long,ofTouchEventArgs> t {ofGetElapsedTimeMillis(),ev};
     touches[ev.id] = t;
 
    // cout << "   ->   " << ev.x << " : " << ev.y <<endl;
@@ -359,7 +359,7 @@ void Physarum::onTouchMove(ofTouchEventArgs &ev)
 {
    // cout << ev.x << " , " <<ev.y <<endl;
     remapTouchPosition(ev);
-    tuple<long,ofTouchEventArgs> t {ofGetElapsedTimeMillis(),ev};
+    std::tuple<long,ofTouchEventArgs> t {ofGetElapsedTimeMillis(),ev};
     touches[ev.id] = t;
 
 
@@ -476,11 +476,11 @@ void Physarum::sendChangeScenario()
     ofNotifyEvent(newOscEvent, m4, this);
 
     // webcontrol message
-    for (size_t i = 0; i < parameterNames.size(); i++)
+    for (size_t i = 0; i < PARAMS_DIMENSION; i++)
     {
         ofxOscMessage m5;
         m5.setAddress("/valueUpdate");
-        m5.addStringArg(parameterNames[i]);
+        m5.addStringArg(pointsDataManager.getSettingName(i));
         m5.addIntArg(pointsDataManager.getValue(i));
         ofNotifyEvent(newOscEvent, m5, this);
     }
@@ -494,34 +494,4 @@ void Physarum::sendChangeScenario()
     s1.setAddress("/sync/" + mode);
     s1.addIntArg(pointsDataManager.selectedIndices[pointsDataManager.currentSelectionIndex ]);
     ofNotifyEvent(newOscEvent, s1, this);
-
-
-{            ofxOscMessage m;
-            m.setAddress("/midi/cc");
-            m.addIntArg(pointsDataManager.selectedIndices[pointsDataManager.getSelectionIndex()]+1);
-            m.addIntArg(127);
-            m.addIntArg(3);
-            ofNotifyEvent(newOscMessageEvent,m,this);
-
-            ofxOscMessage m2;
-            m2.setAddress("/midi/cc");
-            m2.addIntArg(0);
-            m2.addIntArg(pointsDataManager.selectedIndices[pointsDataManager.getSelectionIndex()]);
-            m2.addIntArg(0);
-            ofNotifyEvent(newOscMessageEvent,m2,this);
-
-            ofxOscMessage m3;
-            m3.setAddress("/midi/cc");
-            m3.addIntArg(0);
-            m3.addIntArg(pointsDataManager.selectedIndices[pointsDataManager.getSelectionIndex()]);
-            m3.addIntArg(1);
-            ofNotifyEvent(newOscMessageEvent,m3,this);
-
-            ofxOscMessage m4;
-            m4.setAddress("/midi/cc");
-            m4.addIntArg(0);
-            m4.addIntArg(pointsDataManager.selectedIndices[pointsDataManager.getSelectionIndex()]);
-            m4.addIntArg(2);
-            ofNotifyEvent(newOscMessageEvent,m4,this);
-
 }

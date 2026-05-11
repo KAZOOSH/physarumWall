@@ -79,7 +79,11 @@ void ofApp::setup(){
 
 
     receiver.setup(settings["network"]["oscPortIn"].get<int>());
-    sender.setup(settings["network"]["oscIpOut"].get<std::string>().c_str(),settings["network"]["oscPortOut"].get<int>());
+    for (auto& out : settings["network"]["oscOut"]) {
+        ofxOscSender s;
+        s.setup(out["ip"].get<std::string>(), out["port"].get<int>());
+        sender.push_back(std::move(s));
+    }
     
 
     ofAddListener(textureCreation->newOscEvent,this,&ofApp::onOscSendEvent);
