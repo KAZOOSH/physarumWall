@@ -1,27 +1,32 @@
 [
   {
     "label": "Build Debug",
-    "command": "make Debug -j$(nproc) OF_ROOT=/home/brian/Dev/of_v20260214_linux64_gcc6_release 2>&1",
-    "cwd": "$ZED_WORKTREE_ROOT"
+    "command": "make Debug -j$(nproc) OF_ROOT=/home/brian/Dev/of_v20260309_linux64_gcc6_release 2>&1",
+    "cwd": "$ZED_WORKTREE_ROOT/wallProjection"
   },
   {
     "label": "Build Release",
-    "command": "make -j$(nproc) OF_ROOT=/home/brian/Dev/of_v20260214_linux64_gcc6_release 2>&1",
-    "cwd": "$ZED_WORKTREE_ROOT"
+    "command": "make -j$(nproc) OF_ROOT=/home/brian/Dev/of_v20260309_linux64_gcc6_release 2>&1",
+    "cwd": "$ZED_WORKTREE_ROOT/wallProjection"
+  },
+  {
+    "label": "Build and Run",
+    "command": "make -j$(nproc) OF_ROOT=/home/brian/Dev/of_v20260309_linux64_gcc6_release 2>&1 && make RunRelease",
+    "cwd": "$ZED_WORKTREE_ROOT/wallProjection"
   },
   {
     "label": "Clean Debug",
-    "command": "make CleanDebug OF_ROOT=/home/brian/Dev/of_v20260214_linux64_gcc6_release",
-    "cwd": "$ZED_WORKTREE_ROOT"
+    "command": "make CleanDebug OF_ROOT=/home/brian/Dev/of_v20260309_linux64_gcc6_release",
+    "cwd": "$ZED_WORKTREE_ROOT/wallProjection"
   },
   {
     "label": "Clean Release",
-    "command": "make CleanRelease OF_ROOT=/home/brian/Dev/of_v20260214_linux64_gcc6_release",
-    "cwd": "$ZED_WORKTREE_ROOT"
+    "command": "make CleanRelease OF_ROOT=/home/brian/Dev/of_v20260309_linux64_gcc6_release",
+    "cwd": "$ZED_WORKTREE_ROOT/wallProjection"
   },
   {
     "label": "Clean All",
-    "command": "make clean OF_ROOT=/home/brian/Dev/of_v20260214_linux64_gcc6_release",
-    "cwd": "$ZED_WORKTREE_ROOT"
+    "command": "make clean OF_ROOT=/home/brian/Dev/of_v20260309_linux64_gcc6_release",
+    "cwd": "$ZED_WORKTREE_ROOT/wallProjection"
   }
 ]
