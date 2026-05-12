@@ -20,6 +20,7 @@ int main() {
 	auto mainWindow = ofCreateWindow(settings);
 	auto mainApp = make_shared<ofApp>();
 	vector<std::unique_ptr<of::priv::AbstractEventToken>> listeners;
+	mainApp->windows.push_back(mainWindow);
 
 	// additional windows
 	for (int i = 1; i < (int)jScreens.size(); ++i) {
@@ -34,7 +35,7 @@ int main() {
 			auto window = ofCreateWindow(settings);
 			window->setVerticalSync(false);
 
-			mainApp->extraWindows.push_back(window);
+			mainApp->windows.push_back(window);
 			ofApp * app = mainApp.get();
 			listeners.push_back(window->events().draw.newListener([app, i](ofEventArgs & args) { app->drawWindow(i, args); }));
 			listeners.push_back(window->events().keyPressed.newListener([app, i](ofKeyEventArgs & args) { app->keyPressedWindow(i, args); }));
@@ -55,6 +56,7 @@ int main() {
 		window->setVerticalSync(false);
 
 		ofApp * app = mainApp.get();
+		mainApp->windows.push_back(window);
 		ofAddListener(window->events().draw, mainApp.get(), &ofApp::drawDebugWindow);
 		ofAddListener(window->events().keyPressed, mainApp.get(), &ofApp::keyPressedDebugWindow);
 	}

@@ -23,6 +23,7 @@ public:
 
     void mouseScrolled(ofMouseEventArgs &args);
     void updateTexture(ofMouseEventArgs &args);
+    ofVec2f getMousePosOnTexture(ofMouseEventArgs &args);
 
 private:
     int currentId = 0;

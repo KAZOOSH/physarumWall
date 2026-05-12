@@ -52,7 +52,8 @@ void ofApp::setup() {
 
 	mouseInput = shared_ptr<MouseInput>(new MouseInput());
 	mouseInput->setup(settings);
-	for (auto & win : extraWindows) mouseInput->addWindow(win);
+
+	for (auto & win : windows) mouseInput->addWindow(win);
 
 	controller = shared_ptr<LidarController>(new LidarController());
 	controller->setup(settings);

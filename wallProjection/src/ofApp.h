@@ -67,5 +67,5 @@ public:
 
     StreamManager streamManager;
 
-    vector<shared_ptr<ofAppBaseWindow>> extraWindows;
+    vector<shared_ptr<ofAppBaseWindow>> windows;
 };
