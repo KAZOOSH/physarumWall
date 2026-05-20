@@ -17,12 +17,14 @@ uniform float time;
 
 uniform float actionAreaSizeSigma;
 
+uniform bool isActions;
 uniform float actionsX[MAX_NUMBER_OF_INPUTS];
 uniform float actionsY[MAX_NUMBER_OF_INPUTS];
 uniform int spawn[MAX_NUMBER_OF_INPUTS];
 
-uniform float moveBiasActionX;
-uniform float moveBiasActionY;
+uniform bool isMoveBias;
+uniform float moveBiasActionX[MAX_NUMBER_OF_INPUTS];
+uniform float moveBiasActionY[MAX_NUMBER_OF_INPUTS];
 
 uniform float waveXarray[MAX_NUMBER_OF_WAVES];
 uniform float waveYarray[MAX_NUMBER_OF_WAVES];
@@ -168,20 +170,22 @@ void main() {
     float heading = currAHeading.y;
     vec2 direction = vec2(cos(heading), sin(heading));
 
-    // select closest action position
-    curActionX = actionsX[0];
-    curActionY = actionsY[0];
-    spawnParticles = spawn[0];
-    float dTemp = distance(particlePos, vec2(actionsX[0], actionsY[0]));
+    // select closest action position if action activated
+    curActionX = isActions ? actionsX[0] : -999999;
+    curActionY = isActions ? actionsY[0] : -999999;
+    spawnParticles = isActions ? spawn[0] : -999999;
 
-    for (int i = 0; i < MAX_NUMBER_OF_INPUTS; i++) {
-        vec2 inputAction = vec2(actionsX[i], actionsY[i]);
-        float d = distance(particlePos, inputAction);
-        if (d < dTemp) {
-            curActionX = actionsX[i];
-            curActionY = actionsY[i];
-            spawnParticles = spawn[i];
-            d = dTemp;
+    if (isActions) {
+        float dAction = distance(particlePos, vec2(actionsX[0], actionsY[0]));
+        for (int i = 0; i < MAX_NUMBER_OF_INPUTS; i++) {
+            vec2 inputAction = vec2(actionsX[i], actionsY[i]);
+            float d = distance(particlePos, inputAction);
+            if (d < dAction) {
+                curActionX = actionsX[i];
+                curActionY = actionsY[i];
+                spawnParticles = spawn[i];
+                d = dAction;
+            }
         }
     }
 
@@ -307,11 +311,6 @@ void main() {
         if (sensedObjectMiddle < senseScore) senseScore = sensedObjectMiddle;
     }
 
-    // increase velocity of particles to evade faster when in object
-    if (senseScore != 99999999) {
-        velocity += velocity * 0.15 + senseScore * 0.5;
-    }
-
     float newHeading = heading;
     // heading update, as in the classic physarum algorithm
     if (scoreMiddle > scoreLeft && scoreMiddle > scoreRight)
@@ -319,12 +318,7 @@ void main() {
         ;
     } else if (scoreMiddle < scoreLeft && scoreMiddle < scoreRight)
     {
-        // move out directly of object if only objects
-        if (scoreMiddle < 0) {
-            newHeading = heading;
-        } else {
-            newHeading = (random(particlePos) < 0.5 ? heading - rotationAngle : heading + rotationAngle);
-        }
+        newHeading = (random(particlePos) < 0.5 ? heading - rotationAngle : heading + rotationAngle);
     } else if (scoreRight < scoreLeft)
     {
         newHeading = heading - rotationAngle;
@@ -333,15 +327,40 @@ void main() {
         newHeading = heading + rotationAngle;
     }
 
-    // Forcing movement with joystick action,
+    // Smearing : Forcing movement with rapid touch movement
     // using noise to have more or less of this forced movement, because it looked too boring without
+    // select closest action position
+
+    float curBiasActionX = isMoveBias ? moveBiasActionX[0] : 0;
+    float curBiasActionY = isMoveBias ? moveBiasActionY[0] : 0;
+    float dTemp = distance(particlePos, vec2(moveBiasActionX[0], moveBiasActionY[0]));
+
+    if (isMoveBias) {
+        for (int i = 0; i < MAX_NUMBER_OF_INPUTS; i++) {
+            vec2 inputAction = vec2(moveBiasActionX[i], moveBiasActionY[i]);
+            float d = distance(particlePos, inputAction);
+            if (d < dTemp) {
+                curBiasActionX = moveBiasActionX[i];
+                curBiasActionY = moveBiasActionY[i];
+                d = dTemp;
+            }
+        }
+    }
+
     float noiseValue = noise(vec3(positionForNoise1.x, positionForNoise1.y, 0.8 * time));
     float moveBiasFactor = 5 * lerper * noiseValue;
-    vec2 moveBias = moveBiasFactor * vec2(moveBiasActionX, moveBiasActionY);
+    vec2 moveBias = moveBiasFactor * vec2(curBiasActionX, curBiasActionY);
 
     // position update of the classic physarum algorithm, but with a new move bias for fun interaction
     float classicNewPositionX = particlePos.x + moveDistance * cos(newHeading) + moveBias.x;
     float classicNewPositionY = particlePos.y + moveDistance * sin(newHeading) + moveBias.y;
+
+    // kick velocity away from object after heading has been updated
+    if (senseScore != 99999999) {
+        float evasionScatter = (random(particlePos + vec2(time, 0.0)) - 0.5) * PI * 0.2;
+        newHeading += evasionScatter;
+        velocity += vec2(cos(newHeading), sin(newHeading)) * senseScore * 20.0;
+    }
 
     // inertia experimental stuff... actually it's a lot weirder than just modifying speed instead of position
     // probably the weirdest stuff in the code of this project
@@ -422,12 +441,13 @@ void main() {
     vec2 nextPosUV = mod(nextPos, vec2(width, height)) / vec2(width, height);
     float newHeadingNorm = mod(newHeading, 2.0 * PI) / (2.0 * PI);
     vec2 nextAandHeading = vec2(nextA, fract(newHeadingNorm));
-
-    // added move straight if everything is 0
-    if (sensedMiddle == 0.0) {
-        nextAandHeading = currAHeading;
-    }
-
+    /*
+                                                                                        // added move straight if everything is 0
+                                                                                        if (sensedMiddle == 0.0) {
+                                                                                            nextAandHeading.y = fract(newHeadingNorm); // already computed above, stays in [0,1]
+                                                                                            //nextAandHeading = currAHeading;
+                                                                                        }
+                                                                                    */
     // update particle data
     particlesArray[3 * gl_GlobalInvocationID.x] = packUnorm2x16(nextPosUV);
     particlesArray[3 * gl_GlobalInvocationID.x + 1] = packUnorm2x16(nextAandHeading);

@@ -88,17 +88,24 @@ public:
     int colorModeType = 3;
     float curTranslationAxis1 = 0;
     float curTranslationAxis2 = 0;
-    float curMoveBiasActionX = 0;
-    float curMoveBiasActionY = 0;
-    //float curActionX = SIMULATION_WIDTH/2;
-    //float curActionY = SIMULATION_HEIGHT/2;
+
+    // move bias -> smearing
+    bool isMoveBias = false; //todo expose via osc
+    float moveBiasStrength = 0.1;  //todo expose via osc
+    std::array<float, MAX_NUMBER_OF_INPUTS> curMoveBiasActionX = {};
+    std::array<float, MAX_NUMBER_OF_INPUTS> curMoveBiasActionY = {};
+
     float translationStep = 6.5;
     int currentWaveIndex = 0;
     float curL2 = 0;
     float curR2 = 0;
+
+    // actions -> spawning
+    bool isActions = false;
     std::array<float, MAX_NUMBER_OF_INPUTS> actionsX = {};
     std::array<float, MAX_NUMBER_OF_INPUTS> actionsY = {};
     std::array<int, MAX_NUMBER_OF_INPUTS> spawn = {};
+
     std::array<float, MAX_NUMBER_OF_WAVES> waveXarray = {};
     std::array<float, MAX_NUMBER_OF_WAVES> waveYarray = {};
     std::array<float, MAX_NUMBER_OF_WAVES> waveTriggerTimes = {};

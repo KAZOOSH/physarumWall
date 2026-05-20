@@ -329,9 +329,6 @@ void ofApp::processKeyPressedEvent(int key, int screenId) {
 	if (key == 'r') {
 		settings = ofLoadJson("settings.json");
 	}
-	if (key == 'R') {
-		textureCreation->reloadShaders();
-	}
 	if (key == 'f') {
 		ofToggleFullscreen();
 	}

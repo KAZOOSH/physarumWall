@@ -31,11 +31,13 @@ void MouseInput::setup(ofJson settings)
 
 void MouseInput::mousePressed(ofMouseEventArgs &args)
 {
-    cout << "clicked" <<endl;
+    //cout << "clicked" <<endl;
     ofVec2f p = getMousePosOnTexture(args);
     ofTouchEventArgs t = ofTouchEventArgs(ofTouchEventArgs::down, p.x,p.y, currentId);
     t.width = rTouch;
     t.height = rTouch;
+
+    lastPos = glm::vec2(p.x,p.y);
 
     interactionStart.notify(t);
     updateTexture(args);
@@ -45,6 +47,10 @@ void MouseInput::mouseReleased(ofMouseEventArgs &args)
 {
     ofVec2f p = getMousePosOnTexture(args);
     ofTouchEventArgs t = ofTouchEventArgs(ofTouchEventArgs::up, p.x,p.y, currentId);
+    ofVec2f v = p-lastPos;
+    t.xspeed = v.x;
+    t.yspeed = v.y;
+
     interactionEnd.notify(t);
     updateTexture(args);
 }
@@ -52,11 +58,17 @@ void MouseInput::mouseReleased(ofMouseEventArgs &args)
 void MouseInput::mouseMoved(ofMouseEventArgs &args)
 {
     ofVec2f p = getMousePosOnTexture(args);
+    ofVec2f v = p-lastPos;
     ofTouchEventArgs t = ofTouchEventArgs(ofTouchEventArgs::move, p.x,p.y, currentId);
     t.width = rTouch;
     t.height = rTouch;
+    t.xspeed = v.x;
+    t.yspeed = v.y;
+
     interactionMove.notify(t);
     updateTexture(args);
+
+    lastPos = p;
 }
 
 void MouseInput::keyPressed(ofKeyEventArgs &args)
@@ -98,7 +110,7 @@ void MouseInput::mouseScrolled(ofMouseEventArgs &args)
 ofVec2f MouseInput::getMousePosOnTexture(ofMouseEventArgs &args)
 {
     glm::vec2 winPos = ofGetCurrentWindow() ? ofGetCurrentWindow()->getWindowPosition() : glm::vec2(0, 0);
-    
+
     return ofVec2f(
         ofMap(args.x + winPos.x, 0, screen.x, 0, dimensions.x, true),
         ofMap(args.y + winPos.y, 0, screen.y, 0, dimensions.y, true)

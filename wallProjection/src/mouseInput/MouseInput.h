@@ -31,6 +31,7 @@ private:
     glm::vec2 screen;
 
     int rTouch = 50;
+    glm::vec2 lastPos;
 };
 
 #endif

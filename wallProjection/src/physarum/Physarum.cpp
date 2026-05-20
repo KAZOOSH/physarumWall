@@ -211,10 +211,10 @@ void Physarum::update()
     objectsFbo.begin();
     ofBackground(255);
     ofSetColor(0);
-    ofDrawEllipse(1000, 500, 100, 100);
+    //ofDrawEllipse(1000, 500, 300, 300);
     for (auto& t:touches) {
     	auto touch = std::get<1>(t.second);
-    	ofDrawEllipse(touch.x, touch.y, touch.width, touch.height);
+    	ofDrawEllipse(touch.x, touch.y, touch.width, touch.height*10);
     }
     objectsFbo.end();
 
@@ -275,12 +275,16 @@ void Physarum::update()
 
     moveShader.setUniform1f("actionAreaSizeSigma", currentActionAreaSizeSigma);
 
+    // spawning
+    moveShader.setUniform1i("isActions", isActions);
     moveShader.setUniform1fv("actionsX", actionsX.data(), actionsX.size());
     moveShader.setUniform1fv("actionsY", actionsY.data(), actionsY.size());
     moveShader.setUniform1iv("spawn", spawn.data(), spawn.size());
 
-    moveShader.setUniform1f("moveBiasActionX", curMoveBiasActionX);
-    moveShader.setUniform1f("moveBiasActionY", curMoveBiasActionY);
+    // move bias -> smearing
+    moveShader.setUniform1i("isMoveBias", isMoveBias);
+    moveShader.setUniform1fv("moveBiasActionX", curMoveBiasActionX.data(),curMoveBiasActionX.size());
+    moveShader.setUniform1fv("moveBiasActionY", curMoveBiasActionY.data(),curMoveBiasActionY.size());
 
     moveShader.setUniform1fv("waveXarray", waveXarray.data(), waveXarray.size());
     moveShader.setUniform1fv("waveYarray", waveYarray.data(), waveYarray.size());
@@ -422,6 +426,11 @@ void Physarum::updateInputs(ofTouchEventArgs &t)
         {
             actionsX[count] = get<1>(touch.second).x;
             actionsY[count] = get<1>(touch.second).y;
+
+            curMoveBiasActionX[count] = get<1>(touch.second).xspeed*moveBiasStrength;
+            curMoveBiasActionY[count] = get<1>(touch.second).yspeed*moveBiasStrength;
+
+
             if (t.type == ofTouchEventArgs::down && get<1>(touch.second) == t)
             {
                 spawn[count] = round(ofRandom(1)) + 1;
